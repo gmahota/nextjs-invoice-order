@@ -183,7 +183,7 @@ function NumberFormatCustom(props: NumberFormatCustomProps) {
       }}
       thousandSeparator
       isNumericString
-    // prefix="$"
+      // prefix="$"
     />
   )
 }
@@ -581,8 +581,8 @@ export default function CreateOrder({ id }) {
             label="Quantity"
             value={itemQuantity}
             onChange={event => {
-              setItemQuantity(event.target.value)
-              setItemTotal(event.target.value * itemPrice)
+              setItemQuantity(parseInt(event.target.value))
+              setItemTotal(parseInt(event.target.value) * itemPrice)
             }}
             InputProps={{
               inputComponent: NumberFormatCustom as any
@@ -593,8 +593,8 @@ export default function CreateOrder({ id }) {
             label="Price"
             value={itemPrice}
             onChange={event => {
-              setItemPrice(event.target.value)
-              setItemTotal(event.target.value * itemQuantity)
+              setItemPrice(parseInt(event.target.value))
+              setItemTotal(parseInt(event.target.value) * itemQuantity)
             }}
             name="price"
             id="price"
@@ -610,7 +610,7 @@ export default function CreateOrder({ id }) {
               shrink: true
             }}
             value={itemTotal}
-            onChange={event => setItemTotal(event.target.value)}
+            onChange={event => setItemTotal(parseInt(event.target.value))}
             fullWidth
             InputProps={{
               inputComponent: NumberFormatCustom as any
