@@ -1,6 +1,8 @@
 import React from 'react'
 import Head from 'next/head'
 
+import { Link } from '@material-ui/core'
+
 const Home: React.FC = () => {
   return (
     <div>
@@ -9,7 +11,14 @@ const Home: React.FC = () => {
       </Head>
 
       <main>
-        <h1>Hello world</h1>
+        <ul>
+          <li>
+            <Link href={`/order/${1}`}>Sample Create Order</Link>
+          </li>
+          <li>
+            <Link href="/order">Sample List Order's</Link>
+          </li>
+        </ul>
       </main>
     </div>
   )
