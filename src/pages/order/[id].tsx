@@ -38,10 +38,16 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogTitle from '@material-ui/core/DialogTitle'
 
+import AppBar from '@material-ui/core/AppBar'
+import Tab from '@material-ui/core/Tab'
+import TabContext from '@material-ui/lab/TabContext'
+import TabList from '@material-ui/lab/TabList'
+import TabPanel from '@material-ui/lab/TabPanel'
+
 import { red } from '@material-ui/core/colors'
 import IconButton from '@material-ui/core/IconButton'
-import MoreVertIcon from '@material-ui/icons/MoreVert'
 import AddCircle from '@material-ui/icons/AddCircle'
+import { Checkbox } from '@material-ui/core'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -215,7 +221,7 @@ export default function CreateOrder({ id }) {
   const [grossTotal, setGrossTotal] = useState(0)
   const [vatTotal, setVatTotal] = useState(0)
   const [total, setTotal] = useState(0)
-
+  const [value, setValue] = React.useState('1')
   // Top 100 films as rated by IMDb users. http://www.imdb.com/chart/top
   const productList: ProductOptions[] = [
     { code: 'A001', description: 'Teste', price: 1000 },
@@ -239,6 +245,21 @@ export default function CreateOrder({ id }) {
       name: 'Node.js, SA',
       vat: '411412',
       address: 'Maputo'
+    }
+  ]
+
+  const peddingItens: OrderItem[] = [
+    {
+      id: 1,
+      code: 'A001',
+      description: 'Ola Mundo',
+      unity: 'UN',
+      quantity: 1,
+      price: 10,
+      total: 10,
+      grossTotal: 10,
+      vatTotal: 1.17,
+      project: 'P001'
     }
   ]
 
@@ -296,189 +317,283 @@ export default function CreateOrder({ id }) {
   }
 
   return (
-    <Card>
-      <CardHeader
-        avatar={
-          <Avatar aria-label="recipe" className={classes.avatar}>
-            P
-          </Avatar>
-        }
-        action={
-          <IconButton aria-label="add" onClick={handleClickOpen}>
-            <AddCircle />
-          </IconButton>
-        }
-        title={title}
-        subheader={date}
-      />
-      <CardContent>
-        <form className={classes.root}>
-          <Grid container>
-            <Grid item xs={8}>
-              <div>
-                <Autocomplete
-                  id="customer_code"
-                  options={customerList}
-                  getOptionLabel={option => {
-                    // Value selected with enter, right from the input
-                    if (typeof option === 'string') {
-                      return option
-                    }
-                    // Add "xxx" option created dynamically
-                    if (option.inputValue) {
-                      return option.inputValue
-                    }
-                    // Regular option
-                    return option.name
-                  }}
-                  value={customer}
-                  style={{ width: 300 }}
-                  renderOption={option => option.code}
-                  renderInput={params => (
-                    <TextField {...params} label="Customer" type="text" />
-                  )}
-                  onChange={(event: any, newValue: CustomerOptions | null) => {
-                    if (newValue!) {
-                      setCustomer(newValue.code)
-                      setName(newValue.name)
-                      setVat(newValue.vat)
-                      setAddress(newValue.address)
-                      setDocument('')
-                    } else {
-                      setCustomer('')
-                      setName('')
-                      setVat('')
-                      setAddress('')
-                      setDocument('')
-                    }
-                  }}
+    <>
+      <Paper square>
+        <TabContext value={value}>
+          <AppBar position="static">
+            <TabList
+              onChange={(event: any, newValue: string | null) => {
+                setValue(newValue)
+              }}
+              aria-label="simple tabs example"
+            >
+              <Tab label="Document" value="1" />
+              <Tab label="Resume" value="2" />
+              <Tab label="Pedding" value="3" />
+              <Tab label="Approval" value="4" />
+              <Tab label="Invoices" value="5" />
+              <Tab label="Other's" value="6" />
+            </TabList>
+          </AppBar>
+          <TabPanel value="1">
+            <Box>
+              <Card>
+                <CardHeader
+                  avatar={
+                    <Avatar aria-label="recipe" className={classes.avatar}>
+                      P
+                    </Avatar>
+                  }
+                  action={
+                    <IconButton aria-label="add" onClick={handleClickOpen}>
+                      <AddCircle />
+                    </IconButton>
+                  }
+                  title={title}
+                  subheader={date}
                 />
+                <CardContent>
+                  <form className={classes.root}>
+                    <Grid container>
+                      <Grid item xs={8}>
+                        <div>
+                          <Autocomplete
+                            id="customer_code"
+                            options={customerList}
+                            getOptionLabel={option => {
+                              // Value selected with enter, right from the input
+                              if (typeof option === 'string') {
+                                return option
+                              }
+                              // Add "xxx" option created dynamically
+                              if (option.inputValue) {
+                                return option.inputValue
+                              }
+                              // Regular option
+                              return option.name
+                            }}
+                            value={customer}
+                            style={{ width: 300 }}
+                            renderOption={option => option.code}
+                            renderInput={params => (
+                              <TextField
+                                {...params}
+                                label="Customer"
+                                type="text"
+                              />
+                            )}
+                            onChange={(
+                              event: any,
+                              newValue: CustomerOptions | null
+                            ) => {
+                              if (newValue!) {
+                                setCustomer(newValue.code)
+                                setName(newValue.name)
+                                setVat(newValue.vat)
+                                setAddress(newValue.address)
+                                setDocument('')
+                              } else {
+                                setCustomer('')
+                                setName('')
+                                setVat('')
+                                setAddress('')
+                                setDocument('')
+                              }
+                            }}
+                          />
 
-                <TextField
-                  label="Name"
-                  type="text"
-                  value={name}
-                  autoFocus
-                  margin="dense"
-                  id="name"
-                  multiline
-                  rowsMax={4}
-                  onChange={event => setName(event.target.value)}
-                />
+                          <TextField
+                            label="Name"
+                            type="text"
+                            value={name}
+                            autoFocus
+                            margin="dense"
+                            id="name"
+                            multiline
+                            rowsMax={4}
+                            onChange={event => setName(event.target.value)}
+                          />
 
-                <TextField
-                  label="VAT"
-                  type="text"
-                  value={vat}
-                  autoFocus
-                  margin="dense"
-                  id="vat"
-                  multiline
-                  rowsMax={4}
-                  onChange={event => setVat(event.target.value)}
-                />
-              </div>
-              <div>
-                <TextField
-                  label="Address"
-                  type="text"
-                  value={address}
-                  autoFocus
-                  margin="dense"
-                  id="address"
-                  multiline
-                  rowsMax={4}
-                  onChange={event => setAddress(event.target.value)}
-                />
+                          <TextField
+                            label="Nr. VAT"
+                            type="text"
+                            value={vat}
+                            autoFocus
+                            margin="dense"
+                            id="vat"
+                            multiline
+                            rowsMax={4}
+                            onChange={event => setVat(event.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <TextField
+                            label="Address"
+                            type="text"
+                            value={address}
+                            autoFocus
+                            margin="dense"
+                            id="address"
+                            multiline
+                            rowsMax={4}
+                            onChange={event => setAddress(event.target.value)}
+                          />
 
-                <TextField
-                  label="Document"
-                  type="text"
-                  value={document}
-                  autoFocus
-                  margin="dense"
-                  id="document"
-                  multiline
-                  rowsMax={4}
-                  onChange={event => setDocument(event.target.value)}
-                />
-              </div>
-            </Grid>
-            <Grid item xs={4} className={classes.totalArea}>
-              <TextField
-                autoFocus
-                margin="dense"
-                id="grossTotal"
-                label="Gross Total"
-                value={grossTotal}
-                disabled
-                fullWidth
-              />
+                          <TextField
+                            label="Document"
+                            type="text"
+                            value={document}
+                            autoFocus
+                            margin="dense"
+                            id="document"
+                            multiline
+                            rowsMax={4}
+                            onChange={event => setDocument(event.target.value)}
+                          />
+                        </div>
+                      </Grid>
+                      <Grid item xs={4} className={classes.totalArea}>
+                        <TextField
+                          autoFocus
+                          margin="dense"
+                          id="grossTotal"
+                          label="Gross Total"
+                          value={grossTotal}
+                          disabled
+                          fullWidth
+                        />
 
-              <TextField
-                autoFocus
-                margin="dense"
-                id="vatTotal"
-                label="Vat Total"
-                value={vatTotal}
-                disabled
-                fullWidth
-              />
+                        <TextField
+                          autoFocus
+                          margin="dense"
+                          id="vatTotal"
+                          label="Vat Total"
+                          value={vatTotal}
+                          disabled
+                          fullWidth
+                        />
 
-              <TextField
-                autoFocus
-                margin="dense"
-                id="Total"
-                label="Total"
-                value={total}
-                disabled
-                fullWidth
-              />
-            </Grid>
+                        <TextField
+                          autoFocus
+                          margin="dense"
+                          id="Total"
+                          label="Total"
+                          value={total}
+                          disabled
+                          fullWidth
+                        />
+                      </Grid>
 
-            <Grid item xs={12}>
-              <TableContainer component={Paper}>
-                <Table className={classes.table} aria-label="simple table">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>#</TableCell>
-                      <TableCell align="left">Item</TableCell>
-                      <TableCell align="left">Description</TableCell>
-                      <TableCell align="left">Project</TableCell>
-                      <TableCell align="left">UN</TableCell>
-                      <TableCell align="right">Quantity</TableCell>
-                      <TableCell align="right">Price</TableCell>
-                      <TableCell align="right">Total</TableCell>
+                      <Grid item xs={12}>
+                        <TableContainer component={Paper}>
+                          <Table
+                            className={classes.table}
+                            aria-label="simple table"
+                          >
+                            <TableHead>
+                              <TableRow>
+                                <TableCell>#</TableCell>
+                                <TableCell align="left">Item</TableCell>
+                                <TableCell align="left">Description</TableCell>
+                                <TableCell align="left">Project</TableCell>
+                                <TableCell align="left">UN</TableCell>
+                                <TableCell align="right">Quantity</TableCell>
+                                <TableCell align="right">Price</TableCell>
+                                <TableCell align="right">Total</TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {itens.map(row => (
+                                <TableRow key={row.id}>
+                                  <TableCell component="th" scope="row">
+                                    {row.id}
+                                  </TableCell>
+                                  <TableCell align="left">{row.code}</TableCell>
+                                  <TableCell align="left">
+                                    {row.description}
+                                  </TableCell>
+                                  <TableCell align="left">
+                                    {row.project}
+                                  </TableCell>
+                                  <TableCell align="left">
+                                    {row.unity}
+                                  </TableCell>
+                                  <TableCell align="right">
+                                    {row.quantity}
+                                  </TableCell>
+                                  <TableCell align="right">
+                                    {row.price}
+                                  </TableCell>
+                                  <TableCell align="right">
+                                    {row.total}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      </Grid>
+                    </Grid>
+                  </form>
+                </CardContent>
+
+                <CardActions disableSpacing>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    onClick={handleSave}
+                  >
+                    Save
+                  </Button>
+                </CardActions>
+              </Card>
+            </Box>
+          </TabPanel>
+
+          <TabPanel value="2">Item Three</TabPanel>
+          <TabPanel value="3">
+            <TableContainer component={Paper}>
+              <Table className={classes.table} aria-label="Pedding Itens">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>#</TableCell>
+                    <TableCell align="left">Item</TableCell>
+                    <TableCell align="left">Description</TableCell>
+                    <TableCell align="left">Project</TableCell>
+                    <TableCell align="left">UN</TableCell>
+                    <TableCell align="right">Quantity</TableCell>
+                    <TableCell align="right">Price</TableCell>
+                    <TableCell align="right">Total</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {peddingItens.map(row => (
+                    <TableRow key={row.id}>
+                      <TableCell component="th" scope="row">
+                        <Checkbox
+                          color="primary"
+                          inputProps={{ 'aria-label': 'primary checkbox' }}
+                        />
+                      </TableCell>
+                      <TableCell align="left">{row.code}</TableCell>
+                      <TableCell align="left">{row.description}</TableCell>
+                      <TableCell align="left">{row.project}</TableCell>
+                      <TableCell align="left">{row.unity}</TableCell>
+                      <TableCell align="right">{row.quantity}</TableCell>
+                      <TableCell align="right">{row.price}</TableCell>
+                      <TableCell align="right">{row.total}</TableCell>
                     </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {itens.map(row => (
-                      <TableRow key={row.id}>
-                        <TableCell component="th" scope="row">
-                          {row.id}
-                        </TableCell>
-                        <TableCell align="left">{row.code}</TableCell>
-                        <TableCell align="left">{row.description}</TableCell>
-                        <TableCell align="left">{row.project}</TableCell>
-                        <TableCell align="left">{row.unity}</TableCell>
-                        <TableCell align="right">{row.quantity}</TableCell>
-                        <TableCell align="right">{row.price}</TableCell>
-                        <TableCell align="right">{row.total}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Grid>
-          </Grid>
-        </form>
-      </CardContent>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </TabPanel>
 
-      <CardActions disableSpacing>
-        <Button variant="outlined" color="primary" onClick={handleSave}>
-          Save
-        </Button>
-      </CardActions>
+          <TabPanel value="4">Item Three</TabPanel>
+          <TabPanel value="5">Item Three</TabPanel>
+          <TabPanel value="6">Item Three</TabPanel>
+        </TabContext>
+      </Paper>
 
       <Dialog
         open={open}
@@ -627,6 +742,6 @@ export default function CreateOrder({ id }) {
           </Button>
         </DialogActions>
       </Dialog>
-    </Card>
+    </>
   )
 }

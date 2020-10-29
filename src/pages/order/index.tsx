@@ -73,9 +73,21 @@ export default function OrderList() {
       customer: 'C001',
       name: 'Vercel',
       vat: '1111',
-      status: 'open',
+      status: 'Open',
       total: 20000,
-      itens: []
+      itens: [
+        {
+          id: 0,
+          code: 'A001',
+          description: 'ola',
+          unity: 'UN',
+          quantity: 10,
+          price: 10,
+          total: 100,
+          project: 'P001',
+          status: 'Open'
+        }
+      ]
     },
     {
       id: 2,
