@@ -293,11 +293,11 @@ export default function CreateOrder({ id }) {
       total: tot
     }
 
-    setGrossTotal(Math.round(itemTotal, 2))
+    setGrossTotal(itemTotal)
 
-    setVatTotal(Math.round(vatT, 2))
+    setVatTotal(vatT)
 
-    setTotal(Math.round(tot, 2))
+    setTotal(tot)
 
     const list = [...itens]
 
