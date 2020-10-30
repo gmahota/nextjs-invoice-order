@@ -1,4 +1,4 @@
-type OrderItems {
+type OrderItem {
   id: Int
   code: String
   description: String
@@ -8,10 +8,10 @@ type OrderItems {
   total: Int
   project: String
   status: String
-  order: Order!
+  order: Orders!
 }
 
-type Order {
+type Orders {
   id: Int
   code: String
   customer: String
@@ -19,9 +19,9 @@ type Order {
   vat: String
   status: String
   total: Int
-  OrderItems: [OrderItems] @relation
+  OrderItems: [OrderItem] @relation
 }
 
 type Query {
-  allOrders: [Order]
+  all_Orders: [Orders]
 }

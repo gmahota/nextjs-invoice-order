@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react'
+import Router, { useRouter } from 'next/router'
+
+import useSWR from 'swr'
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
 
@@ -27,6 +30,8 @@ import { Link } from '@material-ui/core'
 import DetailsOutlined from '@material-ui/icons/DetailsOutlined'
 import Search from '@material-ui/icons/Search'
 
+import Order from '../../model/order'
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -41,75 +46,19 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-interface Order {
-  id: number
-  code: string
-  customer: string
-  name: string
-  vat: string
-  status: string
-  total: number
-  itens: Array<{
-    id: number
-    code: string
-    description: string
-    unity: string
-    quantity: number
-    price: number
-    total: number
-    project?: string
-  }>
-}
+const fetcher = url => fetch(url).then(r => r.json())
 
 export default function OrderList() {
+  const router = useRouter()
+  const [ordersList, setOrdersList] = useState<Orde[]>([])
+
+  const { data, error } = useSWR('/api/order/', fetcher)
+
+  console.log(data)
+
   const classes = useStyles()
 
   const [filterStr, setFilterStr] = useState('')
-
-  const ordersList: Order[] = [
-    {
-      id: 1,
-      code: 'PO 001/2020',
-      customer: 'C001',
-      name: 'Vercel',
-      vat: '1111',
-      status: 'Open',
-      total: 20000,
-      itens: [
-        {
-          id: 0,
-          code: 'A001',
-          description: 'ola',
-          unity: 'UN',
-          quantity: 10,
-          price: 10,
-          total: 100,
-          project: 'P001',
-          status: 'Open'
-        }
-      ]
-    },
-    {
-      id: 2,
-      code: 'PO 001/2020',
-      customer: 'C002',
-      name: 'React.js',
-      vat: '1111',
-      status: 'open',
-      total: 10000,
-      itens: []
-    },
-    {
-      id: 3,
-      code: 'PO 001/2020',
-      customer: 'C003',
-      name: 'Next.js',
-      vat: '1111',
-      status: 'close',
-      total: 15000,
-      itens: []
-    }
-  ]
 
   return (
     <Card>
@@ -142,8 +91,8 @@ export default function OrderList() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {ordersList
-                  .filter(
+                {data
+                  ?.filter(
                     e =>
                       filterStr.length === 0 ||
                       e.code.toLowerCase().includes(filterStr) ||
@@ -151,17 +100,17 @@ export default function OrderList() {
                       e.name.toLowerCase().includes(filterStr)
                   )
                   .map(row => (
-                    <TableRow key={row.id}>
+                    <TableRow key={row.data.id}>
                       <TableCell component="th" scope="row">
-                        {row.id}
+                        {row.data.id}
                       </TableCell>
-                      <TableCell align="left">{row.code}</TableCell>
-                      <TableCell align="left">{row.customer}</TableCell>
-                      <TableCell align="left">{row.name}</TableCell>
-                      <TableCell align="left">{row.total}</TableCell>
-                      <TableCell align="right">{row.status}</TableCell>
+                      <TableCell align="left">{row.data.code}</TableCell>
+                      <TableCell align="left">{row.data.customer}</TableCell>
+                      <TableCell align="left">{row.data.name}</TableCell>
+                      <TableCell align="left">{row.data.total}</TableCell>
+                      <TableCell align="right">{row.data.status}</TableCell>
                       <TableCell align="right">
-                        <Link href={`/order/${row.id}`}>
+                        <Link href={`/order/${row.data.id}`}>
                           <DetailsOutlined />
                         </Link>
                       </TableCell>

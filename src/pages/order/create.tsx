@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react'
+import Router, { useRouter } from 'next/router'
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
 
 import Moment from 'react-moment'
 import moment from 'moment'
 
 import Grid from '@material-ui/core/Grid'
-
-import { useRouter } from 'next/router'
 
 import MaskedInput from 'react-text-mask'
 import NumberFormat from 'react-number-format'
@@ -38,12 +37,10 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogTitle from '@material-ui/core/DialogTitle'
 
-
-
 import { red } from '@material-ui/core/colors'
 import IconButton from '@material-ui/core/IconButton'
-import MoreVertIcon from '@material-ui/icons/MoreVert'
 import AddCircle from '@material-ui/icons/AddCircle'
+import Order from './../../model/order'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -130,23 +127,6 @@ interface Customer {
   code: string
   name: string
   vat: string
-}
-interface Order {
-  id: number
-  code: string
-  customer: string
-  name: string
-  vat: string
-  itens: Array<{
-    id: number
-    code: string
-    description: string
-    unity: string
-    quantity: number
-    price: number
-    total: number
-    project?: string
-  }>
 }
 
 interface OrderItem {
@@ -244,8 +224,39 @@ export default function CreateOrder({ id }) {
     }
   ]
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // setOpen(true)
+
+    const order: Order = {
+      id: 0,
+      code: document,
+      customer: customer,
+      name: name,
+      vat: vat,
+      status: 'open',
+      total: total,
+      itens: itens
+    }
+
+    console.log(order)
+
+    try {
+      const res = await fetch('/api/order/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(order)
+      })
+      if (res.status === 200) {
+        Router.push('/')
+      } else {
+        throw new Error(await res.text())
+      }
+    } catch (e: any) {
+      console.error(e)
+      // setErrorMessage(e.message)
+    }
   }
 
   const handleClickOpen = () => {
@@ -282,11 +293,11 @@ export default function CreateOrder({ id }) {
       total: tot
     }
 
-    setGrossTotal(itemTotal)
+    setGrossTotal(Math.round(itemTotal, 2))
 
-    setVatTotal(vatT)
+    setVatTotal(Math.round(vatT, 2))
 
-    setTotal(tot)
+    setTotal(Math.round(tot, 2))
 
     const list = [...itens]
 
@@ -298,343 +309,338 @@ export default function CreateOrder({ id }) {
   }
 
   return (
-    <>
-      <Card>
-        <CardHeader
-          avatar={
-            <Avatar aria-label="recipe" className={classes.avatar}>
-              P
-            </Avatar>
-          }
-          action={
-            <IconButton aria-label="add" onClick={handleClickOpen}>
-              <AddCircle />
-            </IconButton>
-          }
-          title={title}
-          subheader={date}
-        />
-        <CardContent>
-          <form className={classes.root}>
-            <Grid container>
-              <Grid item xs={8}>
-                <div>
-                  <Autocomplete
-                    id="customer_code"
-                    options={customerList}
-                    getOptionLabel={option => {
-                      // Value selected with enter, right from the input
-                      if (typeof option === 'string') {
-                        return option
-                      }
-                      // Add "xxx" option created dynamically
-                      if (option.inputValue) {
-                        return option.inputValue
-                      }
-                      // Regular option
-                      return option.name
-                    }}
-                    value={customer}
-                    style={{ width: 300 }}
-                    renderOption={option => option.code}
-                    renderInput={params => (
-                      <TextField {...params} label="Customer" type="text" />
-                    )}
-                    onChange={(
-                      event: any,
-                      newValue: CustomerOptions | null
-                    ) => {
-                      if (newValue!) {
-                        setCustomer(newValue.code)
-                        setName(newValue.name)
-                        setVat(newValue.vat)
-                        setAddress(newValue.address)
-                        setDocument('')
-                      } else {
-                        setCustomer('')
-                        setName('')
-                        setVat('')
-                        setAddress('')
-                        setDocument('')
-                      }
-                    }}
-                  />
-
-                  <TextField
-                    label="Name"
-                    type="text"
-                    value={name}
-                    autoFocus
-                    margin="dense"
-                    id="name"
-                    multiline
-                    rowsMax={4}
-                    onChange={event => setName(event.target.value)}
-                  />
-
-                  <TextField
-                    label="Nr. VAT"
-                    type="text"
-                    value={vat}
-                    autoFocus
-                    margin="dense"
-                    id="vat"
-                    multiline
-                    rowsMax={4}
-                    onChange={event => setVat(event.target.value)}
-                  />
-                </div>
-                <div>
-                  <TextField
-                    label="Address"
-                    type="text"
-                    value={address}
-                    autoFocus
-                    margin="dense"
-                    id="address"
-                    multiline
-                    rowsMax={4}
-                    onChange={event => setAddress(event.target.value)}
-                  />
-
-                  <TextField
-                    label="Document"
-                    type="text"
-                    value={document}
-                    autoFocus
-                    margin="dense"
-                    id="document"
-                    multiline
-                    rowsMax={4}
-                    onChange={event => setDocument(event.target.value)}
-                  />
-                </div>
-              </Grid>
-              <Grid item xs={4} className={classes.totalArea}>
-                <TextField
-                  autoFocus
-                  margin="dense"
-                  id="grossTotal"
-                  label="Gross Total"
-                  value={grossTotal}
-                  disabled
-                  fullWidth
+    <Card>
+      <CardHeader
+        avatar={
+          <Avatar aria-label="recipe" className={classes.avatar}>
+            P
+          </Avatar>
+        }
+        action={
+          <IconButton aria-label="add" onClick={handleClickOpen}>
+            <AddCircle />
+          </IconButton>
+        }
+        title={title}
+        subheader={date}
+      />
+      <CardContent>
+        <form className={classes.root}>
+          <Grid container>
+            <Grid item xs={8}>
+              <div>
+                <Autocomplete
+                  id="customer_code"
+                  options={customerList}
+                  getOptionLabel={option => {
+                    // Value selected with enter, right from the input
+                    if (typeof option === 'string') {
+                      return option
+                    }
+                    // Add "xxx" option created dynamically
+                    if (option.inputValue) {
+                      return option.inputValue
+                    }
+                    // Regular option
+                    return option.name
+                  }}
+                  value={customer}
+                  style={{ width: 300 }}
+                  renderOption={option => option.code}
+                  renderInput={params => (
+                    <TextField {...params} label="Customer" type="text" />
+                  )}
+                  onChange={(event: any, newValue: CustomerOptions | null) => {
+                    if (newValue!) {
+                      setCustomer(newValue.code)
+                      setName(newValue.name)
+                      setVat(newValue.vat)
+                      setAddress(newValue.address)
+                      setDocument('')
+                    } else {
+                      setCustomer('')
+                      setName('')
+                      setVat('')
+                      setAddress('')
+                      setDocument('')
+                    }
+                  }}
                 />
 
                 <TextField
+                  label="Name"
+                  type="text"
+                  value={name}
                   autoFocus
                   margin="dense"
-                  id="vatTotal"
-                  label="Vat Total"
-                  value={vatTotal}
-                  disabled
-                  fullWidth
+                  id="name"
+                  multiline
+                  rowsMax={4}
+                  onChange={event => setName(event.target.value)}
                 />
 
                 <TextField
+                  label="Nr. VAT"
+                  type="text"
+                  value={vat}
                   autoFocus
                   margin="dense"
-                  id="Total"
-                  label="Total"
-                  value={total}
-                  disabled
-                  fullWidth
+                  id="vat"
+                  multiline
+                  rowsMax={4}
+                  onChange={event => setVat(event.target.value)}
                 />
-              </Grid>
+              </div>
+              <div>
+                <TextField
+                  label="Address"
+                  type="text"
+                  value={address}
+                  autoFocus
+                  margin="dense"
+                  id="address"
+                  multiline
+                  rowsMax={4}
+                  onChange={event => setAddress(event.target.value)}
+                />
 
-              <Grid item xs={12}>
-                <TableContainer component={Paper}>
-                  <Table className={classes.table} aria-label="simple table">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>#</TableCell>
-                        <TableCell align="left">Item</TableCell>
-                        <TableCell align="left">Description</TableCell>
-                        <TableCell align="left">Project</TableCell>
-                        <TableCell align="left">UN</TableCell>
-                        <TableCell align="right">Quantity</TableCell>
-                        <TableCell align="right">Price</TableCell>
-                        <TableCell align="right">Total</TableCell>
-                        <TableCell align="right"></TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {itens.map(row => (
-                        <TableRow key={row.id}>
-                          <TableCell component="th" scope="row">
-                            {row.id}
-                          </TableCell>
-                          <TableCell align="left">{row.code}</TableCell>
-                          <TableCell align="left">{row.description}</TableCell>
-                          <TableCell align="left">{row.project}</TableCell>
-                          <TableCell align="left">{row.unity}</TableCell>
-                          <TableCell align="right">{row.quantity}</TableCell>
-                          <TableCell align="right">{row.price}</TableCell>
-                          <TableCell align="right">{row.total}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Grid>
+                <TextField
+                  label="Document"
+                  type="text"
+                  value={document}
+                  autoFocus
+                  margin="dense"
+                  id="document"
+                  multiline
+                  rowsMax={4}
+                  onChange={event => setDocument(event.target.value)}
+                />
+              </div>
             </Grid>
-          </form>
-        </CardContent>
+            <Grid item xs={4} className={classes.totalArea}>
+              <TextField
+                autoFocus
+                margin="dense"
+                id="grossTotal"
+                label="Gross Total"
+                value={grossTotal}
+                disabled
+                fullWidth
+              />
 
-        <CardActions disableSpacing>
-          <Button variant="outlined" color="primary" onClick={handleSave}>
-            Save
+              <TextField
+                autoFocus
+                margin="dense"
+                id="vatTotal"
+                label="Vat Total"
+                value={vatTotal}
+                disabled
+                fullWidth
+              />
+
+              <TextField
+                autoFocus
+                margin="dense"
+                id="Total"
+                label="Total"
+                value={total}
+                disabled
+                fullWidth
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <TableContainer component={Paper}>
+                <Table className={classes.table} aria-label="simple table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>#</TableCell>
+                      <TableCell align="left">Item</TableCell>
+                      <TableCell align="left">Description</TableCell>
+                      <TableCell align="left">Project</TableCell>
+                      <TableCell align="left">UN</TableCell>
+                      <TableCell align="right">Quantity</TableCell>
+                      <TableCell align="right">Price</TableCell>
+                      <TableCell align="right">Total</TableCell>
+                      <TableCell align="right"></TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {itens.map(row => (
+                      <TableRow key={row.id}>
+                        <TableCell component="th" scope="row">
+                          {row.id}
+                        </TableCell>
+                        <TableCell align="left">{row.code}</TableCell>
+                        <TableCell align="left">{row.description}</TableCell>
+                        <TableCell align="left">{row.project}</TableCell>
+                        <TableCell align="left">{row.unity}</TableCell>
+                        <TableCell align="right">{row.quantity}</TableCell>
+                        <TableCell align="right">{row.price}</TableCell>
+                        <TableCell align="right">{row.total}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          </Grid>
+        </form>
+      </CardContent>
+
+      <CardActions disableSpacing>
+        <Button variant="outlined" color="primary" onClick={handleSave}>
+          Save
+        </Button>
+      </CardActions>
+
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle id="form-dialog-title">Document Item</DialogTitle>
+        <DialogContent>
+          <DialogContentText>Add new Item.</DialogContentText>
+
+          <Autocomplete
+            id="product_code"
+            options={productList}
+            getOptionLabel={option => {
+              // Value selected with enter, right from the input
+              if (typeof option === 'string') {
+                return option
+              }
+              // Add "xxx" option created dynamically
+              if (option.inputValue) {
+                return option.inputValue
+              }
+              // Regular option
+              return option.code
+            }}
+            value={itemCode}
+            renderOption={option => option.code}
+            renderInput={params => (
+              <TextField {...params} label="Code" type="text" fullWidth />
+            )}
+            onChange={(event: any, newValue: ProductOptions | null) => {
+              if (newValue!) {
+                setItemCode(newValue.code)
+                setItemDescription(newValue.description)
+                setItemPrice(newValue.price)
+              } else {
+                setItemCode('')
+                setItemDescription('')
+                setItemPrice(0)
+                setItemQuantity(0)
+                setItemTotal(0)
+              }
+            }}
+          />
+
+          <TextField
+            autoFocus
+            margin="dense"
+            id="description"
+            label="Description"
+            type="text"
+            value={itemDescription}
+            onChange={event => setItemDescription(event.target.value)}
+            fullWidth
+          />
+
+          <Autocomplete
+            id="itemProject"
+            options={projectList}
+            getOptionLabel={option => {
+              // Value selected with enter, right from the input
+              if (typeof option === 'string') {
+                return option
+              }
+              // Add "xxx" option created dynamically
+              if (option.inputValue) {
+                return option.inputValue
+              }
+              // Regular option
+              return option.code
+            }}
+            value={itemProject}
+            renderOption={option => option.code}
+            renderInput={params => (
+              <TextField {...params} label="Project" type="text" fullWidth />
+            )}
+            onChange={(event: any, newValue: ProjectOptions | null) => {
+              if (newValue!) {
+                setItemProject(newValue.code)
+              } else {
+                setItemProject('')
+              }
+            }}
+          />
+
+          <TextField
+            autoFocus
+            margin="dense"
+            id="unity"
+            label="Unity"
+            type="text"
+            value={itemUnity}
+            onChange={event => setItemUnity(event.target.value)}
+            fullWidth
+          />
+          <TextField
+            autoFocus
+            margin="dense"
+            id="quantity"
+            label="Quantity"
+            value={itemQuantity}
+            onChange={event => {
+              setItemQuantity(parseInt(event.target.value))
+              setItemTotal(parseInt(event.target.value) * itemPrice)
+            }}
+            InputProps={{
+              inputComponent: NumberFormatCustom as any
+            }}
+            fullWidth
+          />
+          <TextField
+            label="Price"
+            value={itemPrice}
+            onChange={event => {
+              setItemPrice(parseInt(event.target.value))
+              setItemTotal(parseInt(event.target.value) * itemQuantity)
+            }}
+            name="price"
+            id="price"
+            InputProps={{
+              inputComponent: NumberFormatCustom as any
+            }}
+            fullWidth
+          />
+          <TextField
+            id="total"
+            label="Total"
+            InputLabelProps={{
+              shrink: true
+            }}
+            value={itemTotal}
+            onChange={event => setItemTotal(parseInt(event.target.value))}
+            fullWidth
+            InputProps={{
+              inputComponent: NumberFormatCustom as any
+            }}
+            disabled
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
           </Button>
-        </CardActions>
-
-        <Dialog
-          open={open}
-          onClose={handleClose}
-          aria-labelledby="form-dialog-title"
-        >
-          <DialogTitle id="form-dialog-title">Document Item</DialogTitle>
-          <DialogContent>
-            <DialogContentText>Add new Item.</DialogContentText>
-
-            <Autocomplete
-              id="product_code"
-              options={productList}
-              getOptionLabel={option => {
-                // Value selected with enter, right from the input
-                if (typeof option === 'string') {
-                  return option
-                }
-                // Add "xxx" option created dynamically
-                if (option.inputValue) {
-                  return option.inputValue
-                }
-                // Regular option
-                return option.code
-              }}
-              value={itemCode}
-              renderOption={option => option.code}
-              renderInput={params => (
-                <TextField {...params} label="Code" type="text" fullWidth />
-              )}
-              onChange={(event: any, newValue: ProductOptions | null) => {
-                if (newValue!) {
-                  setItemCode(newValue.code)
-                  setItemDescription(newValue.description)
-                  setItemPrice(newValue.price)
-                } else {
-                  setItemCode('')
-                  setItemDescription('')
-                  setItemPrice(0)
-                  setItemQuantity(0)
-                  setItemTotal(0)
-                }
-              }}
-            />
-
-            <TextField
-              autoFocus
-              margin="dense"
-              id="description"
-              label="Description"
-              type="text"
-              value={itemDescription}
-              onChange={event => setItemDescription(event.target.value)}
-              fullWidth
-            />
-
-            <Autocomplete
-              id="itemProject"
-              options={projectList}
-              getOptionLabel={option => {
-                // Value selected with enter, right from the input
-                if (typeof option === 'string') {
-                  return option
-                }
-                // Add "xxx" option created dynamically
-                if (option.inputValue) {
-                  return option.inputValue
-                }
-                // Regular option
-                return option.code
-              }}
-              value={itemProject}
-              renderOption={option => option.code}
-              renderInput={params => (
-                <TextField {...params} label="Project" type="text" fullWidth />
-              )}
-              onChange={(event: any, newValue: ProjectOptions | null) => {
-                if (newValue!) {
-                  setItemProject(newValue.code)
-                } else {
-                  setItemProject('')
-                }
-              }}
-            />
-
-            <TextField
-              autoFocus
-              margin="dense"
-              id="unity"
-              label="Unity"
-              type="text"
-              value={itemUnity}
-              onChange={event => setItemUnity(event.target.value)}
-              fullWidth
-            />
-            <TextField
-              autoFocus
-              margin="dense"
-              id="quantity"
-              label="Quantity"
-              value={itemQuantity}
-              onChange={event => {
-                setItemQuantity(parseInt(event.target.value))
-                setItemTotal(parseInt(event.target.value) * itemPrice)
-              }}
-              InputProps={{
-                inputComponent: NumberFormatCustom as any
-              }}
-              fullWidth
-            />
-            <TextField
-              label="Price"
-              value={itemPrice}
-              onChange={event => {
-                setItemPrice(parseInt(event.target.value))
-                setItemTotal(parseInt(event.target.value) * itemQuantity)
-              }}
-              name="price"
-              id="price"
-              InputProps={{
-                inputComponent: NumberFormatCustom as any
-              }}
-              fullWidth
-            />
-            <TextField
-              id="total"
-              label="Total"
-              InputLabelProps={{
-                shrink: true
-              }}
-              value={itemTotal}
-              onChange={event => setItemTotal(parseInt(event.target.value))}
-              fullWidth
-              InputProps={{
-                inputComponent: NumberFormatCustom as any
-              }}
-              disabled
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose} color="primary">
-              Cancel
-            </Button>
-            <Button onClick={handleItemAdd} color="primary">
-              Add
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Card>
-    </>
+          <Button onClick={handleItemAdd} color="primary">
+            Add
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Card>
   )
 }

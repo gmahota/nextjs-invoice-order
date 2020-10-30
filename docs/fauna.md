@@ -23,3 +23,12 @@ fauna create-key my_app
 ```
 fauna shell my_app
 ```
+
+### Convert Json to Graphql
+
+(Convert Json)[https://transform.tools/json-to-graphql]
+
+
+### Tutorial
+
+(next-fauna-crud)[https://github.com/kjmczk/next-fauna-crud]
