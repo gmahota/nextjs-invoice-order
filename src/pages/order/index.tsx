@@ -50,7 +50,6 @@ const fetcher = url => fetch(url).then(r => r.json())
 
 export default function OrderList() {
   const router = useRouter()
-  const [ordersList, setOrdersList] = useState<Orde[]>([])
 
   const { data, error } = useSWR('/api/order/', fetcher)
 
@@ -100,7 +99,7 @@ export default function OrderList() {
                       e.name.toLowerCase().includes(filterStr)
                   )
                   .map(row => (
-                    <TableRow key={row.data.id}>
+                    <TableRow key={row.ref['@ref'].id}>
                       <TableCell component="th" scope="row">
                         {row.data.id}
                       </TableCell>
@@ -110,7 +109,7 @@ export default function OrderList() {
                       <TableCell align="left">{row.data.total}</TableCell>
                       <TableCell align="right">{row.data.status}</TableCell>
                       <TableCell align="right">
-                        <Link href={`/order/${row.data.id}`}>
+                        <Link href={`/order/${row.ref['@ref'].id}`}>
                           <DetailsOutlined />
                         </Link>
                       </TableCell>
