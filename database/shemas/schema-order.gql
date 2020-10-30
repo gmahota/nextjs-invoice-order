@@ -1,0 +1,27 @@
+type OrderItem {
+  id: Int
+  code: String
+  description: String
+  unity: String
+  quantity: Int
+  price: Int
+  total: Int
+  project: String
+  status: String
+  order: Orders!
+}
+
+type Orders {
+  id: Int
+  code: String
+  customer: String
+  name: String
+  vat: String
+  status: String
+  total: Int
+  OrderItems: [OrderItem] @relation
+}
+
+type Query {
+  all_Orders: [Orders]
+}

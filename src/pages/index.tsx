@@ -13,7 +13,7 @@ const Home: React.FC = () => {
       <main>
         <ul>
           <li>
-            <Link href={`/order/${1}`}>Sample Create Order</Link>
+            <Link href={'/order/create'}>Sample Create Order</Link>
           </li>
           <li>
             <Link href="/order">Sample List Order's</Link>

@@ -1,0 +1,21 @@
+interface Order {
+  id: number
+  code: string
+  customer: string
+  name: string
+  vat: string
+  status: string
+  total: number
+  itens: Array<{
+    id: number
+    code: string
+    description: string
+    unity: string
+    quantity: number
+    price: number
+    total: number
+    project?: string
+  }>
+}
+
+export default Order

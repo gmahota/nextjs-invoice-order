@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react'
+import Router, { useRouter } from 'next/router'
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
 
 import Moment from 'react-moment'
 import moment from 'moment'
 
 import Grid from '@material-ui/core/Grid'
-
-import { useRouter } from 'next/router'
 
 import MaskedInput from 'react-text-mask'
 import NumberFormat from 'react-number-format'
@@ -40,8 +39,8 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 
 import { red } from '@material-ui/core/colors'
 import IconButton from '@material-ui/core/IconButton'
-import MoreVertIcon from '@material-ui/icons/MoreVert'
 import AddCircle from '@material-ui/icons/AddCircle'
+import Order from './../../model/order'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -129,23 +128,6 @@ interface Customer {
   name: string
   vat: string
 }
-interface Order {
-  id: number
-  code: string
-  customer: string
-  name: string
-  vat: string
-  itens: Array<{
-    id: number
-    code: string
-    description: string
-    unity: string
-    quantity: number
-    price: number
-    total: number
-    project?: string
-  }>
-}
 
 interface OrderItem {
   id: number
@@ -191,7 +173,7 @@ function NumberFormatCustom(props: NumberFormatCustomProps) {
 export default function CreateOrder({ id }) {
   const classes = useStyles()
 
-  const [title, setTitle] = useState('Customer Order')
+  const [title, setTitle] = useState('New Customer Order')
   const [date, setDate] = useState(moment().format('LLLL'))
 
   const [customer, setCustomer] = useState('')
@@ -242,8 +224,39 @@ export default function CreateOrder({ id }) {
     }
   ]
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // setOpen(true)
+
+    const order: Order = {
+      id: 0,
+      code: document,
+      customer: customer,
+      name: name,
+      vat: vat,
+      status: 'open',
+      total: total,
+      itens: itens
+    }
+
+    console.log(order)
+
+    try {
+      const res = await fetch('/api/order/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(order)
+      })
+      if (res.status === 200) {
+        Router.push('/')
+      } else {
+        throw new Error(await res.text())
+      }
+    } catch (e: any) {
+      console.error(e)
+      // setErrorMessage(e.message)
+    }
   }
 
   const handleClickOpen = () => {
@@ -367,7 +380,7 @@ export default function CreateOrder({ id }) {
                 />
 
                 <TextField
-                  label="VAT"
+                  label="Nr. VAT"
                   type="text"
                   value={vat}
                   autoFocus
@@ -449,6 +462,7 @@ export default function CreateOrder({ id }) {
                       <TableCell align="right">Quantity</TableCell>
                       <TableCell align="right">Price</TableCell>
                       <TableCell align="right">Total</TableCell>
+                      <TableCell align="right"></TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
