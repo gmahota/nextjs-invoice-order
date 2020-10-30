@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
+import { GetStaticProps, GetStaticPaths } from 'next'
+
+import useSWR from 'swr'
 
 import Moment from 'react-moment'
 import moment from 'moment'
@@ -48,6 +51,7 @@ import { red } from '@material-ui/core/colors'
 import IconButton from '@material-ui/core/IconButton'
 import AddCircle from '@material-ui/icons/AddCircle'
 import { Checkbox } from '@material-ui/core'
+import Order from '../../model/order'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -135,23 +139,6 @@ interface Customer {
   name: string
   vat: string
 }
-interface Order {
-  id: number
-  code: string
-  customer: string
-  name: string
-  vat: string
-  itens: Array<{
-    id: number
-    code: string
-    description: string
-    unity: string
-    quantity: number
-    price: number
-    total: number
-    project?: string
-  }>
-}
 
 interface OrderItem {
   id: number
@@ -194,17 +181,21 @@ function NumberFormatCustom(props: NumberFormatCustomProps) {
   )
 }
 
-export default function CreateOrder({ id }) {
+export default function CreateOrder({ order }) {
+  if (!order) {
+    return <div>Carregando...</div>
+  }
+
   const classes = useStyles()
 
   const [title, setTitle] = useState('Customer Order')
   const [date, setDate] = useState(moment().format('LLLL'))
 
-  const [customer, setCustomer] = useState('')
-  const [name, setName] = useState('')
-  const [vat, setVat] = useState('')
-  const [address, setAddress] = useState('')
-  const [document, setDocument] = useState('')
+  const [customer, setCustomer] = useState(order.customer)
+  const [name, setName] = useState(order.name)
+  const [vat, setVat] = useState(order.vat)
+  const [address, setAddress] = useState(order.address)
+  const [document, setDocument] = useState(order.code)
 
   const [itens, setItens] = useState<OrderItem[]>([])
 
@@ -248,20 +239,7 @@ export default function CreateOrder({ id }) {
     }
   ]
 
-  const peddingItens: OrderItem[] = [
-    {
-      id: 1,
-      code: 'A001',
-      description: 'Ola Mundo',
-      unity: 'UN',
-      quantity: 1,
-      price: 10,
-      total: 10,
-      grossTotal: 10,
-      vatTotal: 1.17,
-      project: 'P001'
-    }
-  ]
+  const peddingItens: OrderItem[] = order.OrderItems
 
   const handleSave = () => {
     // setOpen(true)
@@ -503,10 +481,10 @@ export default function CreateOrder({ id }) {
                               </TableRow>
                             </TableHead>
                             <TableBody>
-                              {itens.map(row => (
-                                <TableRow key={row.id}>
+                              {order.OrderItems.map(row => (
+                                <TableRow key={row.ref['@ref'].id}>
                                   <TableCell component="th" scope="row">
-                                    {row.id}
+                                    {row.ref['@ref'].id}
                                   </TableCell>
                                   <TableCell align="left">{row.code}</TableCell>
                                   <TableCell align="left">
@@ -744,4 +722,39 @@ export default function CreateOrder({ id }) {
       </Dialog>
     </>
   )
+}
+
+export const getStaticPaths: GetStaticPaths = async req => {
+  const response = await fetch(
+    'https://nextjs-invoice-order.vercel.app/api/order/'
+  )
+  const data = await response.json()
+
+  const paths = data?.map(order => {
+    return { params: { id: order.ref['@ref'].id.toString() } }
+  })
+
+  return {
+    paths,
+    fallback: true
+  }
+}
+
+export const getStaticProps: GetStaticProps = async context => {
+  const { id } = context.params
+
+  const response = await fetch(
+    `https://nextjs-invoice-order.vercel.app/api/order/${id}`
+  )
+
+  const data = await response.json()
+
+  console.log(data)
+
+  return {
+    props: {
+      order: data
+    },
+    revalidate: 10
+  }
 }
