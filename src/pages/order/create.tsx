@@ -40,7 +40,7 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import { red } from '@material-ui/core/colors'
 import IconButton from '@material-ui/core/IconButton'
 import AddCircle from '@material-ui/icons/AddCircle'
-import Order from './../../model/order'
+import Order from '../../model/sales/order'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
