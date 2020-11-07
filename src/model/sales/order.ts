@@ -8,7 +8,7 @@ interface Order {
   vat: string
   status: string
   total: number
-  items: Array<OrderItem>
+  items: OrderItem[]
 }
 
 export default Order
