@@ -1,7 +1,7 @@
 import OrderItem from './orderItem'
 
 interface Order {
-  id: string
+  id: number
   code: string
   customer: string
   name: string

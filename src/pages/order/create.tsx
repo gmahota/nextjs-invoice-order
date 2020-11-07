@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react'
 import Router, { useRouter } from 'next/router'
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
 
+import Order from '../../model/sales/order'
+import OrderItem from '../../model/sales/orderItem'
+import { CustomerOptions, Customer } from '../../model/base/customer'
+
 import Moment from 'react-moment'
 import moment from 'moment'
 
@@ -40,7 +44,6 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import { red } from '@material-ui/core/colors'
 import IconButton from '@material-ui/core/IconButton'
 import AddCircle from '@material-ui/icons/AddCircle'
-import Order from '../../model/sales/order'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -102,14 +105,6 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-interface CustomerOptions {
-  inputValue?: string
-  code: string
-  name: string
-  vat: string
-  address: string
-}
-
 interface ProductOptions {
   inputValue?: string
   code: string
@@ -122,26 +117,6 @@ interface ProjectOptions {
   code: string
   description: string
 }
-interface Customer {
-  id: number
-  code: string
-  name: string
-  vat: string
-}
-
-interface OrderItem {
-  id: number
-  code: string
-  description: string
-  unity: string
-  quantity: number
-  price: number
-  total: number
-  grossTotal: number
-  vatTotal: number
-  project?: string
-}
-
 interface NumberFormatCustomProps {
   inputRef: (instance: NumberFormat | null) => void
   onChange: (event: { target: { name: string; value: string } }) => void
@@ -182,7 +157,7 @@ export default function CreateOrder({ id }) {
   const [address, setAddress] = useState('')
   const [document, setDocument] = useState('')
 
-  const [itens, setItens] = useState<OrderItem[]>([])
+  const [items, setItems] = useState<OrderItem[]>([])
 
   // New Item
   const [open, setOpen] = React.useState(false)
@@ -235,7 +210,7 @@ export default function CreateOrder({ id }) {
       vat: vat,
       status: 'open',
       total: total,
-      itens: itens
+      items: items
     }
 
     console.log(order)
@@ -281,7 +256,7 @@ export default function CreateOrder({ id }) {
     const tot: number = Number.parseFloat(itemTotal.toString()) + vatT
 
     const item: OrderItem = {
-      id: itens.length + 1,
+      id: items.length + 1,
       code: itemCode,
       description: itemDescription,
       project: itemProject,
@@ -299,11 +274,11 @@ export default function CreateOrder({ id }) {
 
     setTotal(tot)
 
-    const list = [...itens]
+    const list = [...items]
 
     list.push(item)
 
-    setItens(list)
+    setItems(list)
 
     setOpen(false)
   }
@@ -466,7 +441,7 @@ export default function CreateOrder({ id }) {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {itens.map(row => (
+                    {items.map(row => (
                       <TableRow key={row.id}>
                         <TableCell component="th" scope="row">
                           {row.id}

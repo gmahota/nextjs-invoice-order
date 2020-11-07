@@ -53,8 +53,6 @@ export default function OrderList() {
 
   const { data, error } = useSWR('/api/order/', fetcher)
 
-  console.log(data)
-
   const classes = useStyles()
 
   const [filterStr, setFilterStr] = useState('')

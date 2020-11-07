@@ -746,7 +746,7 @@ export const getStaticProps: GetStaticProps = async context => {
   } = await response.json()
 
   const order: Order = {
-    id: id.toString(),
+    id: Number.parseInt(id.toString()),
     code,
     customer,
     name,
