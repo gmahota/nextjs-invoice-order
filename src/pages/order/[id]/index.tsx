@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
 import { GetStaticProps, GetStaticPaths } from 'next'
 
@@ -9,8 +9,6 @@ import { CustomerOptions } from '../../../model/base/customer'
 import moment from 'moment'
 
 import Grid from '@material-ui/core/Grid'
-
-import { useRouter } from 'next/router'
 
 import NumberFormat from 'react-number-format'
 
@@ -744,23 +742,18 @@ export const getStaticProps: GetStaticProps = async context => {
     vat,
     status,
     total,
-    OrderItems,
-    totalVat
+    OrderItems
   } = await response.json()
 
-  const items: OrderItem[] = [...OrderItems]
-
-  console.log(items)
-
   const order: Order = {
-    id: id.toString(),
+    id: Number.parseInt(id.toString()),
     code,
     customer,
     name,
     vat,
     status,
     total,
-    items
+    items: [...OrderItems]
   }
 
   return {
