@@ -2,16 +2,16 @@ import React, { useEffect, useState } from 'react'
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
 import { GetStaticProps, GetStaticPaths } from 'next'
 
-import useSWR from 'swr'
+import Order from '../../../model/sales/order'
+import OrderItem from '../../../model/sales/orderItem'
+import { CustomerOptions } from '../../../model/base/customer'
 
-import Moment from 'react-moment'
 import moment from 'moment'
 
 import Grid from '@material-ui/core/Grid'
 
 import { useRouter } from 'next/router'
 
-import MaskedInput from 'react-text-mask'
 import NumberFormat from 'react-number-format'
 
 import Avatar from '@material-ui/core/Avatar'
@@ -51,7 +51,6 @@ import { red } from '@material-ui/core/colors'
 import IconButton from '@material-ui/core/IconButton'
 import AddCircle from '@material-ui/icons/AddCircle'
 import { Checkbox } from '@material-ui/core'
-import Order from '../../model/order'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -113,14 +112,6 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-interface CustomerOptions {
-  inputValue?: string
-  code: string
-  name: string
-  vat: string
-  address: string
-}
-
 interface ProductOptions {
   inputValue?: string
   code: string
@@ -132,25 +123,6 @@ interface ProjectOptions {
   inputValue?: string
   code: string
   description: string
-}
-interface Customer {
-  id: number
-  code: string
-  name: string
-  vat: string
-}
-
-interface OrderItem {
-  id: number
-  code: string
-  description: string
-  unity: string
-  quantity: number
-  price: number
-  total: number
-  grossTotal: number
-  vatTotal: number
-  project?: string
 }
 
 interface NumberFormatCustomProps {
@@ -188,8 +160,10 @@ export default function CreateOrder({ order }) {
 
   const classes = useStyles()
 
+  // Form
   const [title, setTitle] = useState('Customer Order')
   const [date, setDate] = useState(moment().format('LLLL'))
+  const [isSubmitting, setIsSubmitting] = useState(true)
 
   const [customer, setCustomer] = useState(order.customer)
   const [name, setName] = useState(order.name)
@@ -209,9 +183,15 @@ export default function CreateOrder({ order }) {
   const [itemPrice, setItemPrice] = useState(0)
   const [itemTotal, setItemTotal] = useState(0)
 
-  const [grossTotal, setGrossTotal] = useState(0)
-  const [vatTotal, setVatTotal] = useState(0)
-  const [total, setTotal] = useState(0)
+  const [grossTotal, setGrossTotal] = useState(
+    order.items.reduce((sum, current) => sum + current.grossTotal, 0)
+  )
+  const [vatTotal, setVatTotal] = useState(
+    order.items.reduce((sum, current) => sum + current.vatTotal, 0)
+  )
+  const [total, setTotal] = useState(
+    order.items.reduce((sum, current) => sum + current.total, 0)
+  )
   const [value, setValue] = React.useState('1')
   // Top 100 films as rated by IMDb users. http://www.imdb.com/chart/top
   const productList: ProductOptions[] = [
@@ -239,7 +219,7 @@ export default function CreateOrder({ order }) {
     }
   ]
 
-  const peddingItens: OrderItem[] = order.OrderItems
+  const peddingItens: OrderItem[] = order.items
 
   const handleSave = () => {
     // setOpen(true)
@@ -323,7 +303,11 @@ export default function CreateOrder({ order }) {
                     </Avatar>
                   }
                   action={
-                    <IconButton aria-label="add" onClick={handleClickOpen}>
+                    <IconButton
+                      aria-label="add"
+                      onClick={handleClickOpen}
+                      disabled={isSubmitting}
+                    >
                       <AddCircle />
                     </IconButton>
                   }
@@ -350,6 +334,7 @@ export default function CreateOrder({ order }) {
                               // Regular option
                               return option.name
                             }}
+                            disabled={isSubmitting}
                             value={customer}
                             style={{ width: 300 }}
                             renderOption={option => option.code}
@@ -390,6 +375,7 @@ export default function CreateOrder({ order }) {
                             multiline
                             rowsMax={4}
                             onChange={event => setName(event.target.value)}
+                            disabled={isSubmitting}
                           />
 
                           <TextField
@@ -402,6 +388,7 @@ export default function CreateOrder({ order }) {
                             multiline
                             rowsMax={4}
                             onChange={event => setVat(event.target.value)}
+                            disabled={isSubmitting}
                           />
                         </div>
                         <div>
@@ -415,6 +402,7 @@ export default function CreateOrder({ order }) {
                             multiline
                             rowsMax={4}
                             onChange={event => setAddress(event.target.value)}
+                            disabled={isSubmitting}
                           />
 
                           <TextField
@@ -427,6 +415,7 @@ export default function CreateOrder({ order }) {
                             multiline
                             rowsMax={4}
                             onChange={event => setDocument(event.target.value)}
+                            disabled={isSubmitting}
                           />
                         </div>
                       </Grid>
@@ -481,10 +470,10 @@ export default function CreateOrder({ order }) {
                               </TableRow>
                             </TableHead>
                             <TableBody>
-                              {order.OrderItems.map(row => (
-                                <TableRow key={row.ref['@ref'].id}>
+                              {order.items?.map(row => (
+                                <TableRow key={row.id}>
                                   <TableCell component="th" scope="row">
-                                    {row.ref['@ref'].id}
+                                    {row.id}
                                   </TableCell>
                                   <TableCell align="left">{row.code}</TableCell>
                                   <TableCell align="left">
@@ -520,6 +509,7 @@ export default function CreateOrder({ order }) {
                     variant="outlined"
                     color="primary"
                     onClick={handleSave}
+                    disabled={isSubmitting}
                   >
                     Save
                   </Button>
@@ -545,7 +535,7 @@ export default function CreateOrder({ order }) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {peddingItens.map(row => (
+                  {peddingItens?.map(row => (
                     <TableRow key={row.id}>
                       <TableCell component="th" scope="row">
                         <Checkbox
@@ -725,9 +715,9 @@ export default function CreateOrder({ order }) {
 }
 
 export const getStaticPaths: GetStaticPaths = async req => {
-  const response = await fetch(
-    'https://nextjs-invoice-order.vercel.app/api/order/'
-  )
+  const url = process.env.host
+
+  const response = await fetch(url + '/api/order/')
   const data = await response.json()
 
   const paths = data?.map(order => {
@@ -743,17 +733,39 @@ export const getStaticPaths: GetStaticPaths = async req => {
 export const getStaticProps: GetStaticProps = async context => {
   const { id } = context.params
 
-  const response = await fetch(
-    `https://nextjs-invoice-order.vercel.app/api/order/${id}`
-  )
+  const url = process.env.host
 
-  const data = await response.json()
+  const response = await fetch(url + `/api/order/${id}`)
 
-  console.log(data)
+  const {
+    code,
+    customer,
+    name,
+    vat,
+    status,
+    total,
+    OrderItems,
+    totalVat
+  } = await response.json()
+
+  const items: OrderItem[] = [...OrderItems]
+
+  console.log(items)
+
+  const order: Order = {
+    id: id.toString(),
+    code,
+    customer,
+    name,
+    vat,
+    status,
+    total,
+    items
+  }
 
   return {
     props: {
-      order: data
+      order: order
     },
     revalidate: 10
   }

@@ -30,7 +30,7 @@ import { Link } from '@material-ui/core'
 import DetailsOutlined from '@material-ui/icons/DetailsOutlined'
 import Search from '@material-ui/icons/Search'
 
-import Order from '../../model/order'
+import Order from '../../model/sales/order'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
