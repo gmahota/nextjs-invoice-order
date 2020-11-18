@@ -51,6 +51,10 @@ const fetcher = url => fetch(url).then(r => r.json())
 export default function OrderList() {
   const router = useRouter()
 
+  if (router.isFallback) {
+    return <p>Carregando...</p>
+  }
+
   const { data, error } = useSWR('/api/order/', fetcher)
 
   const classes = useStyles()
