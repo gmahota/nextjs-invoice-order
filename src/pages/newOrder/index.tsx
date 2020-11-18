@@ -213,8 +213,6 @@ export default function CreateOrder({ id }) {
       items: items
     }
 
-    console.log(order)
-
     try {
       const res = await fetch('/api/order/create', {
         method: 'POST',

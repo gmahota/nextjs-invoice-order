@@ -1,4 +1,7 @@
 import React, { useState } from 'react'
+import { useRouter } from 'next/router'
+import useSWR from 'swr'
+
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
 import { GetStaticProps, GetStaticPaths } from 'next'
 
@@ -152,6 +155,13 @@ function NumberFormatCustom(props: NumberFormatCustomProps) {
 }
 
 export default function CreateOrder({ order }) {
+  const router = useRouter()
+
+  if (router.isFallback) {
+    // your loading indicator
+    return <div>loading...</div>
+  }
+
   if (!order) {
     return <div>Carregando...</div>
   }
@@ -713,8 +723,12 @@ export default function CreateOrder({ order }) {
 }
 
 export const getStaticPaths: GetStaticPaths = async req => {
-  const url = process.env.host
+  const url =
+    process.env.NODE_ENV === 'development'
+      ? process.env.SERVER_URI
+      : `https://${process.env.VERCEL_URL}`
 
+  console.log(process.env.SERVER_URI)
   const response = await fetch(url + '/api/order/')
   const data = await response.json()
 
@@ -729,37 +743,48 @@ export const getStaticPaths: GetStaticPaths = async req => {
 }
 
 export const getStaticProps: GetStaticProps = async context => {
-  const { id } = context.params
+  try {
+    const { id } = context.params
 
-  const url = process.env.host
+    const url =
+      process.env.NODE_ENV === 'development'
+        ? process.env.SERVER_URI
+        : `https://${process.env.VERCEL_URL}`
 
-  const response = await fetch(url + `/api/order/${id}`)
+    const response = await fetch(url + `/api/order/${id}`)
+    const {
+      code,
+      customer,
+      name,
+      vat,
+      status,
+      total,
+      OrderItems
+    } = await response.json()
 
-  const {
-    code,
-    customer,
-    name,
-    vat,
-    status,
-    total,
-    OrderItems
-  } = await response.json()
+    const order: Order = {
+      id: Number.parseInt(id.toString()),
+      code,
+      customer,
+      name,
+      vat,
+      status,
+      total,
+      items: [...OrderItems]
+    }
 
-  const order: Order = {
-    id: Number.parseInt(id.toString()),
-    code,
-    customer,
-    name,
-    vat,
-    status,
-    total,
-    items: [...OrderItems]
-  }
-
-  return {
-    props: {
-      order: order
-    },
-    revalidate: 10
+    return {
+      props: {
+        order: order
+      },
+      revalidate: 10
+    }
+  } catch (e) {
+    return {
+      props: {
+        order: null
+      },
+      revalidate: 10
+    }
   }
 }
