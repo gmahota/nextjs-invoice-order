@@ -726,7 +726,7 @@ export const getStaticPaths: GetStaticPaths = async req => {
   const url =
     process.env.NODE_ENV === 'development'
       ? process.env.SERVER_URI
-      : `https://${process.env.VERCEL_URL}`
+      : process.env.VERCEL_URL
 
   console.log(process.env.SERVER_URI)
   const response = await fetch(url + '/api/order/')
@@ -749,7 +749,7 @@ export const getStaticProps: GetStaticProps = async context => {
     const url =
       process.env.NODE_ENV === 'development'
         ? process.env.SERVER_URI
-        : `https://${process.env.VERCEL_URL}`
+        : process.env.VERCEL_URL
 
     const response = await fetch(url + `/api/order/${id}`)
     const {
