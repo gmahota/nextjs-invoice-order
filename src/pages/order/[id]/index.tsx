@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/router'
-import useSWR from 'swr'
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
 import { GetStaticProps, GetStaticPaths } from 'next'
@@ -154,7 +153,7 @@ function NumberFormatCustom(props: NumberFormatCustomProps) {
   )
 }
 
-export default function CreateOrder({ order }) {
+export default function OrderDetails({ order }) {
   const router = useRouter()
 
   if (router.isFallback) {
@@ -723,22 +722,30 @@ export default function CreateOrder({ order }) {
 }
 
 export const getStaticPaths: GetStaticPaths = async req => {
-  const url =
-    process.env.NODE_ENV === 'development'
-      ? process.env.SERVER_URI
-      : process.env.VERCEL_URL
+  try {
+    const url =
+      process.env.NODE_ENV === 'development'
+        ? process.env.SERVER_URI
+        : `https://${process.env.VERCEL_URL}`
 
-  console.log(process.env.SERVER_URI)
-  const response = await fetch(url + '/api/order/')
-  const data = await response.json()
+    const response = await fetch(url + '/api/order/')
+    const data = await response.json()
 
-  const paths = data?.map(order => {
-    return { params: { id: order.ref['@ref'].id.toString() } }
-  })
+    const paths = data?.map(order => {
+      return { params: { id: order.ref['@ref'].id.toString() } }
+    })
 
-  return {
-    paths,
-    fallback: true
+    return {
+      paths,
+      fallback: true
+    }
+  } catch (e) {
+    console.log(e)
+
+    return {
+      paths: [],
+      fallback: true
+    }
   }
 }
 
@@ -749,7 +756,7 @@ export const getStaticProps: GetStaticProps = async context => {
     const url =
       process.env.NODE_ENV === 'development'
         ? process.env.SERVER_URI
-        : process.env.VERCEL_URL
+        : `https://${process.env.VERCEL_URL}`
 
     const response = await fetch(url + `/api/order/${id}`)
     const {
@@ -780,6 +787,8 @@ export const getStaticProps: GetStaticProps = async context => {
       revalidate: 10
     }
   } catch (e) {
+    console.log(e)
+
     return {
       props: {
         order: null
