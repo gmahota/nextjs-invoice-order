@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
+import { GetStaticProps, GetStaticPaths } from 'next'
 import useSWR from 'swr'
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
-import { GetStaticProps, GetStaticPaths } from 'next'
 
 import Order from '../../../model/sales/order'
 import OrderItem from '../../../model/sales/orderItem'
@@ -52,6 +52,8 @@ import { red } from '@material-ui/core/colors'
 import IconButton from '@material-ui/core/IconButton'
 import AddCircle from '@material-ui/icons/AddCircle'
 import { Checkbox } from '@material-ui/core'
+
+import api from '../../../services/api'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -154,7 +156,9 @@ function NumberFormatCustom(props: NumberFormatCustomProps) {
   )
 }
 
-export default function CreateOrder({ order }) {
+const fetcher = url => fetch(url).then(r => r.json())
+
+export default function OrderDetails({ order }) {
   const router = useRouter()
 
   if (router.isFallback) {
@@ -165,8 +169,6 @@ export default function CreateOrder({ order }) {
   if (!order) {
     return <div>Carregando...</div>
   }
-
-  const classes = useStyles()
 
   // Form
   const [title, setTitle] = useState('Customer Order')
@@ -201,6 +203,60 @@ export default function CreateOrder({ order }) {
     order.items.reduce((sum, current) => sum + current.total, 0)
   )
   const [value, setValue] = React.useState('1')
+  const [peddingItens, setPeddingItens] = useState<OrderItem[]>([])
+  // SerializeOrder(data)
+
+  // orderDetails()
+
+  const classes = useStyles()
+
+  // function SerializeOrder(id: any, data: any) {
+  //   if (!data) return
+  //   console.log(data)
+  //   const {
+  //     code,
+  //     customer,
+  //     name,
+  //     address,
+  //     vat,
+  //     status,
+  //     total,
+  //     OrderItems
+  //   } = data
+
+  //   const order: Order = {
+  //     id: Number.parseInt(id.toString()),
+  //     code,
+  //     customer,
+  //     name,
+  //     vat,
+  //     address,
+  //     status,
+  //     total,
+  //     items: [...OrderItems]
+  //   }
+  //   setOrder(order)
+  //   orderDetails()
+  // }
+
+  function orderDetails() {
+    if (order) {
+      console.log(order)
+      setCustomer(order.customer)
+      setName(order.name)
+      setVat(order.vat)
+      setAddress(order.address)
+      setDocument(order.code)
+
+      setGrossTotal(
+        order.items.reduce((sum, current) => sum + current.grossTotal, 0)
+      )
+      setVatTotal(
+        order.items.reduce((sum, current) => sum + current.vatTotal, 0)
+      )
+      setTotal(order.items.reduce((sum, current) => sum + current.total, 0))
+    }
+  }
   // Top 100 films as rated by IMDb users. http://www.imdb.com/chart/top
   const productList: ProductOptions[] = [
     { code: 'A001', description: 'Teste', price: 1000 },
@@ -227,8 +283,9 @@ export default function CreateOrder({ order }) {
     }
   ]
 
-  const peddingItens: OrderItem[] = order.items
+  // const peddingItens: OrderItem[] = order.items
 
+  // use the setup from the examples directory as normal
   const handleSave = () => {
     // setOpen(true)
   }
@@ -723,50 +780,47 @@ export default function CreateOrder({ order }) {
 }
 
 export const getStaticPaths: GetStaticPaths = async req => {
-  const url =
-    process.env.NODE_ENV === 'development'
-      ? process.env.SERVER_URI
-      : `https://${process.env.VERCEL_URL}`
+  try {
+    const { data } = await api.get('/api/order')
 
-  console.log(process.env.SERVER_URI)
-  const response = await fetch(url + '/api/order/')
-  const data = await response.json()
+    const paths = data?.map(order => {
+      return { params: { id: order.ref['@ref'].id.toString() } }
+    })
 
-  const paths = data?.map(order => {
-    return { params: { id: order.ref['@ref'].id.toString() } }
-  })
-
-  return {
-    paths,
-    fallback: true
+    return {
+      paths,
+      fallback: true
+    }
+  } catch (e) {
+    return {
+      paths: [],
+      fallback: true
+    }
   }
 }
 
 export const getStaticProps: GetStaticProps = async context => {
   try {
     const { id } = context.params
+    const { data } = await api.get(`/api/order/${id}`)
 
-    const url =
-      process.env.NODE_ENV === 'development'
-        ? process.env.SERVER_URI
-        : `https://${process.env.VERCEL_URL}`
-
-    const response = await fetch(url + `/api/order/${id}`)
     const {
       code,
       customer,
       name,
+      address,
       vat,
       status,
       total,
       OrderItems
-    } = await response.json()
+    } = data
 
     const order: Order = {
       id: Number.parseInt(id.toString()),
       code,
       customer,
       name,
+      // address,
       vat,
       status,
       total,

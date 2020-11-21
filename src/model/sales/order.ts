@@ -5,7 +5,8 @@ interface Order {
   code: string
   customer: string
   name: string
-  vat: string
+  address?: string
+  vat?: string
   status: string
   total: number
   items: OrderItem[]
