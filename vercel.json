@@ -1,6 +1,6 @@
 {
   "env": {
-    "FAUNADB_SECRET_KEY": "@faunadb_secret_key",
-    "host":"@host"
+    "FAUNADB_SECRET_KEY": "@FAUNADB_SECRET_KEY",
+    "VERCEL_URL":"@VERCEL_URL"
   }
 }
