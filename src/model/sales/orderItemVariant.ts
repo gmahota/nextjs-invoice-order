@@ -1,4 +1,4 @@
-interface OrderItemVarient {
+interface OrderItemVariant {
   id: number
   quantity: number
   price: number
@@ -7,4 +7,4 @@ interface OrderItemVarient {
   total: number
 }
 
-export default OrderItemVarient
+export default OrderItemVariant

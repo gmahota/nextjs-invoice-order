@@ -6,7 +6,7 @@ import { GetStaticProps, GetStaticPaths } from 'next'
 
 import Order from '../../../model/sales/order'
 import OrderItem from '../../../model/sales/orderItem'
-import OrderItemVarient from '../../../model/sales/orderItemVarient'
+import OrderItemVariant from '../../../model/sales/orderItemVariant'
 import { CustomerOptions } from '../../../model/base/customer'
 
 import moment from 'moment'
@@ -210,13 +210,13 @@ export default function OrderDetails({ order }) {
   const [openLine, setOpenLine] = useState(false)
 
   const [grossTotal, setGrossTotal] = useState(
-    order.items.reduce((sum, current) => sum + current.grossTotal, 0)
+    order.items?.reduce((sum, current) => sum + current.grossTotal, 0)
   )
   const [vatTotal, setVatTotal] = useState(
-    order.items.reduce((sum, current) => sum + current.vatTotal, 0)
+    order.items?.reduce((sum, current) => sum + current.vatTotal, 0)
   )
   const [total, setTotal] = useState(
-    order.items.reduce((sum, current) => sum + current.total, 0)
+    order.items?.reduce((sum, current) => sum + current.total, 0)
   )
   const [value, setValue] = React.useState('1')
   // Top 100 films as rated by IMDb users. http://www.imdb.com/chart/top
@@ -328,7 +328,7 @@ export default function OrderDetails({ order }) {
       Number.parseFloat(itemTotal.toString()) * Number.parseFloat('0.17')
     const tot: number = Number.parseFloat(itemTotal.toString()) + vatT
 
-    const itemVarient: OrderItemVarient = {
+    const itemVarient: OrderItemVariant = {
       id: peddingItens[selectedRow - 1].itemVarients?.length + 1 || 1,
       quantity: itemQuantity,
       price: itemPrice,
@@ -357,7 +357,8 @@ export default function OrderDetails({ order }) {
     const [openLine, setOpenLine] = React.useState(false)
     const classes = useStyles()
 
-    const itemVariants: OrderItemVariant = order.items[row.id - 1].itemVarients
+    const itemVariants: OrderItemVariant[] =
+      order.items[row.id - 1].itemVarients
 
     return (
       <React.Fragment>
