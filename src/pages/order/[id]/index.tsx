@@ -232,6 +232,10 @@ export default function OrderDetails({ order }) {
     // setOpen(true)
   }
 
+  const handleBack = () => {
+    router.push('/order')
+  }
+
   const handleClickOpen = () => {
     setItemCode('')
     setItemDescription('')
@@ -515,6 +519,13 @@ export default function OrderDetails({ order }) {
                   <Button
                     variant="outlined"
                     color="primary"
+                    onClick={handleBack}
+                  >
+                    Voltar
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="primary"
                     onClick={handleSave}
                     disabled={isSubmitting}
                   >
@@ -769,6 +780,8 @@ export const getStaticProps: GetStaticProps = async context => {
       OrderItems
     } = await response.json()
 
+    const items = OrderItems || []
+
     const order: Order = {
       id: Number.parseInt(id.toString()),
       code,
@@ -777,7 +790,7 @@ export const getStaticProps: GetStaticProps = async context => {
       vat,
       status,
       total,
-      items: [...OrderItems]
+      items: [...items]
     }
 
     return {
