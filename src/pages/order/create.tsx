@@ -146,6 +146,8 @@ function NumberFormatCustom(props: NumberFormatCustomProps) {
 }
 
 export default function CreateOrder({ id }) {
+  const router = useRouter()
+
   const classes = useStyles()
 
   const [title, setTitle] = useState('New Customer Order')
@@ -246,6 +248,10 @@ export default function CreateOrder({ id }) {
 
   const handleClose = () => {
     setOpen(false)
+  }
+
+  const handleCancel = () => {
+    router.push('/order')
   }
 
   const handleItemAdd = () => {
@@ -464,6 +470,10 @@ export default function CreateOrder({ id }) {
       <CardActions disableSpacing>
         <Button variant="outlined" color="primary" onClick={handleSave}>
           Save
+        </Button>
+
+        <Button variant="outlined" color="primary" onClick={handleCancel}>
+          Cancel
         </Button>
       </CardActions>
 

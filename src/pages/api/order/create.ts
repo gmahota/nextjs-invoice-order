@@ -3,7 +3,7 @@ import { query as q } from 'faunadb'
 import { serverClient } from '../../../../utils/fauna-auth'
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const { code, customer, name, vat, status, total, itens } = req.body
+  const { code, customer, name, vat, status, total, items } = req.body
 
   try {
     await serverClient.query(
@@ -15,7 +15,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           vat,
           status,
           total,
-          OrderItems: itens
+          OrderItems: items
         }
       })
     )
