@@ -1,3 +1,4 @@
+import OrderItemVarient from './orderItemVarient'
 interface OrderItem {
   id: number
   code: string
@@ -10,6 +11,7 @@ interface OrderItem {
   total: number
   project?: string
   vatCode?: string
+  itemVarients?: OrderItemVarient[]
 }
 
 export default OrderItem

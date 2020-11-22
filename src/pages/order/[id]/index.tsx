@@ -6,6 +6,7 @@ import { GetStaticProps, GetStaticPaths } from 'next'
 
 import Order from '../../../model/sales/order'
 import OrderItem from '../../../model/sales/orderItem'
+import OrderItemVarient from '../../../model/sales/orderItemVarient'
 import { CustomerOptions } from '../../../model/base/customer'
 
 import moment from 'moment'
@@ -18,6 +19,7 @@ import Avatar from '@material-ui/core/Avatar'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 
 import Box from '@material-ui/core/Box'
+import Collapse from '@material-ui/core/Collapse'
 
 import Card from '@material-ui/core/Card'
 import CardHeader from '@material-ui/core/CardHeader'
@@ -31,6 +33,8 @@ import TableCell from '@material-ui/core/TableCell'
 import TableContainer from '@material-ui/core/TableContainer'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
+import Typography from '@material-ui/core/Typography'
+
 import Paper from '@material-ui/core/Paper'
 
 import Button from '@material-ui/core/Button'
@@ -49,8 +53,14 @@ import TabPanel from '@material-ui/lab/TabPanel'
 
 import { red } from '@material-ui/core/colors'
 import IconButton from '@material-ui/core/IconButton'
-import AddCircle from '@material-ui/icons/AddCircle'
+
 import { Checkbox } from '@material-ui/core'
+
+import AddCircle from '@material-ui/icons/AddCircle'
+import SaveIcon from '@material-ui/icons/Save'
+import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos'
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -58,6 +68,9 @@ const useStyles = makeStyles((theme: Theme) =>
       '& .MuiTextField-root': {
         margin: theme.spacing(1),
         width: '25ch'
+      },
+      '& > *': {
+        borderBottom: 'unset'
       }
     },
     bullet: {
@@ -181,7 +194,7 @@ export default function OrderDetails({ order }) {
   const [itens, setItens] = useState<OrderItem[]>([])
 
   // New Item
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = useState(false)
   const [itemCode, setItemCode] = useState('')
   const [itemDescription, setItemDescription] = useState('')
   const [itemProject, setItemProject] = useState('')
@@ -189,6 +202,12 @@ export default function OrderDetails({ order }) {
   const [itemQuantity, setItemQuantity] = useState(0)
   const [itemPrice, setItemPrice] = useState(0)
   const [itemTotal, setItemTotal] = useState(0)
+
+  // Pedding
+  const [selectedRow, setSelectedRow] = useState(0)
+  const [peddingTotalAmount, setPeddingTotalAmount] = useState(0)
+  const [openPedding, setOpenPedding] = useState(false)
+  const [openLine, setOpenLine] = useState(false)
 
   const [grossTotal, setGrossTotal] = useState(
     order.items.reduce((sum, current) => sum + current.grossTotal, 0)
@@ -248,6 +267,25 @@ export default function OrderDetails({ order }) {
     setOpen(true)
   }
 
+  const handleClosePedding = () => {
+    setOpenPedding(false)
+  }
+
+  const handleClickOpenPedding = (id: number) => {
+    const item = order.items.find(i => i.id === id)
+
+    setSelectedRow(id)
+    setItemCode(item.code)
+    setItemDescription(item.description)
+    setItemProject(item.project)
+    setItemUnity('Un')
+    setItemQuantity(item.quantity)
+    setItemPrice(item.price)
+    setItemTotal(item.total)
+
+    setOpenPedding(true)
+  }
+
   const handleClose = () => {
     setOpen(false)
   }
@@ -283,6 +321,112 @@ export default function OrderDetails({ order }) {
     setItens(list)
 
     setOpen(false)
+  }
+
+  const handlePeddingItemAdd = () => {
+    const vatT: number =
+      Number.parseFloat(itemTotal.toString()) * Number.parseFloat('0.17')
+    const tot: number = Number.parseFloat(itemTotal.toString()) + vatT
+
+    const itemVarient: OrderItemVarient = {
+      id: peddingItens[selectedRow - 1].itemVarients?.length + 1 || 1,
+      quantity: itemQuantity,
+      price: itemPrice,
+      grossTotal: itemTotal,
+      vatTotal: vatT,
+      total: tot
+    }
+
+    setPeddingTotalAmount(tot)
+
+    if (!order.items[selectedRow - 1].itemVarients) {
+      order.items[selectedRow - 1].itemVarients = []
+    }
+    order.items[selectedRow - 1].itemVarients.push(itemVarient)
+
+    setOpenPedding(false)
+  }
+
+  type OrderItemProps = {
+    children?: React.ReactNode
+    row?: OrderItem
+  }
+
+  function RowPedding(props: OrderItemProps) {
+    const { row } = props
+    const [openLine, setOpenLine] = React.useState(false)
+    const classes = useStyles()
+
+    const itemVariants: OrderItemVariant = order.items[row.id - 1].itemVarients
+
+    return (
+      <React.Fragment>
+        <TableRow key={row.id} className={classes.root}>
+          <TableCell>
+            <IconButton
+              aria-label="expand row"
+              size="small"
+              onClick={() => setOpenLine(!openLine)}
+            >
+              {openLine ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            </IconButton>
+          </TableCell>
+          <TableCell align="left">{row.code}</TableCell>
+          <TableCell align="left">{row.description}</TableCell>
+          <TableCell align="left">{row.project}</TableCell>
+          <TableCell align="left">{row.unity}</TableCell>
+          <TableCell align="right">{row.quantity}</TableCell>
+          <TableCell align="right">{row.price}</TableCell>
+          <TableCell align="right">{row.total}</TableCell>
+          <TableCell align="right">
+            <IconButton
+              aria-label="Add Line To Invoice"
+              onClick={() => {
+                handleClickOpenPedding(row.id)
+              }}
+              color="inherit"
+            >
+              <ArrowForwardIosIcon />
+            </IconButton>
+          </TableCell>
+        </TableRow>
+
+        <TableRow>
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+            <Collapse in={openLine} timeout="auto" unmountOnExit>
+              <Box margin={1}>
+                <Table size="small" aria-label="purchases">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Item</TableCell>
+                      <TableCell>Description</TableCell>
+                      <TableCell>Project</TableCell>
+                      <TableCell>Un</TableCell>
+                      <TableCell>Quantity</TableCell>
+                      <TableCell align="right">Amount</TableCell>
+                      <TableCell align="right">Total Price (MT)</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {itemVariants?.map(item => (
+                      <TableRow key={item.id}>
+                        <TableCell align="left">{row.code}</TableCell>
+                        <TableCell align="left">{row.description}</TableCell>
+                        <TableCell align="left">{row.project}</TableCell>
+                        <TableCell align="left">{row.unity}</TableCell>
+                        <TableCell align="right">{item.quantity}</TableCell>
+                        <TableCell align="right">{item.price}</TableCell>
+                        <TableCell align="right">{item.total}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Box>
+            </Collapse>
+          </TableCell>
+        </TableRow>
+      </React.Fragment>
+    )
   }
 
   return (
@@ -535,44 +679,62 @@ export default function OrderDetails({ order }) {
               </Card>
             </Box>
           </TabPanel>
-
           <TabPanel value="2">Item Three</TabPanel>
           <TabPanel value="3">
-            <TableContainer component={Paper}>
-              <Table className={classes.table} aria-label="Pedding Itens">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>#</TableCell>
-                    <TableCell align="left">Item</TableCell>
-                    <TableCell align="left">Description</TableCell>
-                    <TableCell align="left">Project</TableCell>
-                    <TableCell align="left">UN</TableCell>
-                    <TableCell align="right">Quantity</TableCell>
-                    <TableCell align="right">Price</TableCell>
-                    <TableCell align="right">Total</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {peddingItens?.map(row => (
-                    <TableRow key={row.id}>
-                      <TableCell component="th" scope="row">
-                        <Checkbox
-                          color="primary"
-                          inputProps={{ 'aria-label': 'primary checkbox' }}
-                        />
-                      </TableCell>
-                      <TableCell align="left">{row.code}</TableCell>
-                      <TableCell align="left">{row.description}</TableCell>
-                      <TableCell align="left">{row.project}</TableCell>
-                      <TableCell align="left">{row.unity}</TableCell>
-                      <TableCell align="right">{row.quantity}</TableCell>
-                      <TableCell align="right">{row.price}</TableCell>
-                      <TableCell align="right">{row.total}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+            <Card>
+              <CardHeader
+                avatar={
+                  <Avatar aria-label="recipe" className={classes.avatar}>
+                    P
+                  </Avatar>
+                }
+                action={
+                  <IconButton aria-label="add" onClick={handleClickOpen}>
+                    <SaveIcon />
+                  </IconButton>
+                }
+                title="Pedding Items"
+                subheader="Select line Items to Approval"
+              />
+              <CardContent>
+                <Grid item xs={12} className={classes.root}>
+                  <TextField
+                    autoFocus
+                    margin="dense"
+                    id="peddingTotal"
+                    label="Total Amount"
+                    value={peddingTotalAmount}
+                    disabled
+                    fullWidth
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TableContainer component={Paper}>
+                    <Table className={classes.table} aria-label="Pedding Itens">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell align="left"></TableCell>
+                          <TableCell align="left">Item</TableCell>
+                          <TableCell align="left">Description</TableCell>
+                          <TableCell align="left">Project</TableCell>
+                          <TableCell align="left">UN</TableCell>
+                          <TableCell align="right">Quantity</TableCell>
+                          <TableCell align="right">Price</TableCell>
+                          <TableCell align="right">Total</TableCell>
+                          <TableCell align="right"></TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {peddingItens?.map(row => (
+                          <RowPedding key={row.id} row={row} />
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Grid>
+              </CardContent>
+            </Card>
           </TabPanel>
 
           <TabPanel value="4">Item Three</TabPanel>
@@ -724,6 +886,113 @@ export default function OrderDetails({ order }) {
             Cancel
           </Button>
           <Button onClick={handleItemAdd} color="primary">
+            Add
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openPedding}
+        onClose={handleClosePedding}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle id="form-dialog-title">
+          Pedding Item - Line {selectedRow}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>Select Item To Transform.</DialogContentText>
+
+          <TextField
+            label="Product"
+            id="product_code"
+            value={itemCode}
+            fullWidth
+            disabled
+          />
+
+          <TextField
+            autoFocus
+            margin="dense"
+            id="description"
+            label="Description"
+            type="text"
+            value={itemDescription}
+            onChange={event => setItemDescription(event.target.value)}
+            fullWidth
+            disabled
+          />
+
+          <TextField
+            autoFocus
+            margin="dense"
+            id="itemProject"
+            label="Project"
+            type="text"
+            value={itemProject}
+            fullWidth
+            disabled
+          />
+
+          <TextField
+            autoFocus
+            margin="dense"
+            id="unity"
+            label="Unity"
+            type="text"
+            value={itemUnity}
+            onChange={event => setItemUnity(event.target.value)}
+            fullWidth
+            disabled
+          />
+          <TextField
+            autoFocus
+            margin="dense"
+            id="quantity"
+            label="Quantity"
+            value={itemQuantity}
+            onChange={event => {
+              setItemQuantity(parseInt(event.target.value))
+              setItemTotal(parseInt(event.target.value) * itemPrice)
+            }}
+            InputProps={{
+              inputComponent: NumberFormatCustom as any
+            }}
+            fullWidth
+          />
+          <TextField
+            label="Price"
+            value={itemPrice}
+            onChange={event => {
+              setItemPrice(parseInt(event.target.value))
+              setItemTotal(parseInt(event.target.value) * itemQuantity)
+            }}
+            name="price"
+            id="price"
+            InputProps={{
+              inputComponent: NumberFormatCustom as any
+            }}
+            fullWidth
+          />
+          <TextField
+            id="total"
+            label="Total"
+            InputLabelProps={{
+              shrink: true
+            }}
+            value={itemTotal}
+            onChange={event => setItemTotal(parseInt(event.target.value))}
+            fullWidth
+            InputProps={{
+              inputComponent: NumberFormatCustom as any
+            }}
+            disabled
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClosePedding} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handlePeddingItemAdd} color="primary">
             Add
           </Button>
         </DialogActions>
