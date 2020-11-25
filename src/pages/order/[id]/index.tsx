@@ -7,6 +7,11 @@ import { GetStaticProps, GetStaticPaths } from 'next'
 import Order from '../../../model/sales/order'
 import OrderItem from '../../../model/sales/orderItem'
 import OrderItemVariant from '../../../model/sales/orderItemVariant'
+import {
+  get_PeddingItems,
+  update_OrderPeddingStatus
+} from '../../../service/sales/orderService'
+
 import { CustomerOptions } from '../../../model/base/customer'
 
 import moment from 'moment'
@@ -23,7 +28,6 @@ import Collapse from '@material-ui/core/Collapse'
 
 import Card from '@material-ui/core/Card'
 import CardHeader from '@material-ui/core/CardHeader'
-import CardMedia from '@material-ui/core/CardMedia'
 import CardContent from '@material-ui/core/CardContent'
 import CardActions from '@material-ui/core/CardActions'
 
@@ -33,7 +37,6 @@ import TableCell from '@material-ui/core/TableCell'
 import TableContainer from '@material-ui/core/TableContainer'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
-import Typography from '@material-ui/core/Typography'
 
 import Paper from '@material-ui/core/Paper'
 
@@ -54,11 +57,10 @@ import TabPanel from '@material-ui/lab/TabPanel'
 import { red } from '@material-ui/core/colors'
 import IconButton from '@material-ui/core/IconButton'
 
-import { Checkbox } from '@material-ui/core'
-
 import AddCircle from '@material-ui/icons/AddCircle'
 import SaveIcon from '@material-ui/icons/Save'
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos'
+import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos'
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 
@@ -181,6 +183,7 @@ export default function OrderDetails({ order }) {
   const classes = useStyles()
 
   // Form
+  const [id, setId] = useState(router.query.id)
   const [title, setTitle] = useState('Customer Order')
   const [date, setDate] = useState(moment().format('LLLL'))
   const [isSubmitting, setIsSubmitting] = useState(true)
@@ -245,10 +248,32 @@ export default function OrderDetails({ order }) {
     }
   ]
 
-  const peddingItens: OrderItem[] = order.items
+  const peddingItens: OrderItem[] = get_PeddingItems(order)
 
   const handleSave = () => {
     // setOpen(true)
+  }
+
+  const handlePeddingSave = async () => {
+    update_OrderPeddingStatus(order)
+
+    try {
+      const res = await fetch(`/api/order/${id}/update`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(order)
+      })
+      if (res.status === 200) {
+        // Router.push('/')
+      } else {
+        throw new Error(await res.text())
+      }
+    } catch (e: any) {
+      console.error(e)
+      // setErrorMessage(e.message)
+    }
   }
 
   const handleBack = () => {
@@ -418,6 +443,17 @@ export default function OrderDetails({ order }) {
                         <TableCell align="right">{item.quantity}</TableCell>
                         <TableCell align="right">{item.price}</TableCell>
                         <TableCell align="right">{item.total}</TableCell>
+                        <TableCell align="right">
+                          <IconButton
+                            aria-label="Add Line To Invoice"
+                            onClick={() => {
+                              handleClickOpenPedding(row.id)
+                            }}
+                            color="inherit"
+                          >
+                            <ArrowBackIosIcon />
+                          </IconButton>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -690,7 +726,7 @@ export default function OrderDetails({ order }) {
                   </Avatar>
                 }
                 action={
-                  <IconButton aria-label="add" onClick={handleClickOpen}>
+                  <IconButton aria-label="add" onClick={handlePeddingSave}>
                     <SaveIcon />
                   </IconButton>
                 }

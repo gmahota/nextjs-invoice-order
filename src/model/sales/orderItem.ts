@@ -9,6 +9,7 @@ interface OrderItem {
   grossTotal: number
   vatTotal: number
   total: number
+  status?: string
   project?: string
   vatCode?: string
   itemVarients?: OrderItemVariant[]

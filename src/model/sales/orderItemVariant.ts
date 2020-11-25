@@ -5,6 +5,7 @@ interface OrderItemVariant {
   grossTotal: number
   vatTotal: number
   total: number
+  status?: string
 }
 
 export default OrderItemVariant

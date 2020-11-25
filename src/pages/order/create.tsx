@@ -140,7 +140,7 @@ function NumberFormatCustom(props: NumberFormatCustomProps) {
       }}
       thousandSeparator
       isNumericString
-      // prefix="$"
+    // prefix="$"
     />
   )
 }
@@ -230,7 +230,6 @@ export default function CreateOrder({ id }) {
       }
     } catch (e: any) {
       console.error(e)
-      // setErrorMessage(e.message)
     }
   }
 
@@ -269,7 +268,8 @@ export default function CreateOrder({ id }) {
       price: itemPrice,
       grossTotal: itemTotal,
       vatTotal: vatT,
-      total: tot
+      total: tot,
+      status: 'open'
     }
 
     setGrossTotal(itemTotal)
