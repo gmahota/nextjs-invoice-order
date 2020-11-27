@@ -41,6 +41,7 @@ export const DialogPedding = function DialogPedding(props: Props) {
 
   function handleAdd() {
     const newItem: OrderItem = {
+      id: 0,
       code: itemCode,
       description: itemDescription,
       project: itemProject,
