@@ -26,6 +26,7 @@ import SaveIcon from '@material-ui/icons/Save'
 // Order
 import Order from './../../model/sales/order'
 import OrderItem from './../../model/sales/orderItem'
+import OrderItemVariant from './../../model/sales/orderItemVariant'
 import {
   get_PeddingItems,
   set_OrderPeddingStatus
@@ -34,7 +35,6 @@ import {
 import { red } from '@material-ui/core/colors'
 import { RowPedding } from './../OrderRow/RowPedding'
 import { DialogPedding } from './../Dialog/DialogPedding'
-import OrderItemVariant from './../../model/sales/orderItemVariant'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

@@ -70,6 +70,7 @@ import ThumbUpIcon from '@material-ui/icons/ThumbUp'
 import ThumbDownAltIcon from '@material-ui/icons/ThumbDownAlt'
 
 import { OrderPedding } from './../../../components/Order/OrderPedding'
+import { OrderApproval } from './../../../components/Order/OrderApproval'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -211,11 +212,6 @@ export default function OrderDetails({ order }) {
   const [itemPrice, setItemPrice] = useState(0)
   const [itemTotal, setItemTotal] = useState(0)
 
-  // Aproval
-  const [approvalTotalAmount, setApprovalTotalAmount] = useState(0)
-  const [openAproval, setOpenAproval] = useState(false)
-  const [openLineAproval, setOpenLineAproval] = useState(false)
-
   const [grossTotal, setGrossTotal] = useState(
     order.items?.reduce((sum, current) => sum + current.grossTotal, 0)
   )
@@ -252,8 +248,6 @@ export default function OrderDetails({ order }) {
     }
   ]
 
-  const approvalItens: OrderItem[] = get_ApprovalItems(order)
-
   const handleSave = () => {
     // setOpen(true)
   }
@@ -272,21 +266,6 @@ export default function OrderDetails({ order }) {
     setItemTotal(0)
 
     setOpen(true)
-  }
-
-  const handleClickOpenPedding = (id: number) => {
-    const item = order.items.find(i => i.id === id)
-
-    setSelectedRow(id)
-    setItemCode(item.code)
-    setItemDescription(item.description)
-    setItemProject(item.project)
-    setItemUnity('Un')
-    setItemQuantity(item.quantity)
-    setItemPrice(item.price)
-    setItemTotal(item.total)
-
-    setOpenPedding(true)
   }
 
   const handleClose = () => {
@@ -326,108 +305,10 @@ export default function OrderDetails({ order }) {
     setOpen(false)
   }
 
-  // Approval
-  const handleClickApproveAll = () => {}
-
-  const handleClickDeclineAll = () => {}
-
-  const handleClickApproveAllRowVarients = (rowNumber: number) => {}
-
-  const handleClickDeclineAllRowVarients = (rowNumber: number) => {}
-
   type OrderItemProps = {
     children?: React.ReactNode
     row?: OrderItem
   }
-
-  // function RowPedding(props: OrderItemProps) {
-  //   const { row, order } = props
-  //   const [openLine, setOpenLine] = React.useState(false)
-  //   const classes = useStyles()
-
-  //   const itemVariants: OrderItemVariant[] =
-  //     order.items[row.id - 1].itemVarients
-
-  //   return (
-  //     <React.Fragment>
-  //       <TableRow key={row.id} className={classes.root}>
-  //         <TableCell>
-  //           <IconButton
-  //             aria-label="expand row"
-  //             size="small"
-  //             onClick={() => setOpenLine(!openLine)}
-  //           >
-  //             {openLine ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-  //           </IconButton>
-  //         </TableCell>
-  //         <TableCell align="left">{row.code}</TableCell>
-  //         <TableCell align="left">{row.description}</TableCell>
-  //         <TableCell align="left">{row.project}</TableCell>
-  //         <TableCell align="left">{row.unity}</TableCell>
-  //         <TableCell align="right">{row.quantity}</TableCell>
-  //         <TableCell align="right">{row.price}</TableCell>
-  //         <TableCell align="right">{row.total}</TableCell>
-  //         <TableCell align="right">
-  //           <IconButton
-  //             aria-label="Add Line To Invoice"
-  //             onClick={() => {
-  //               handleClickOpenPedding(row.id)
-  //             }}
-  //             color="inherit"
-  //           >
-  //             <ArrowForwardIosIcon />
-  //           </IconButton>
-  //         </TableCell>
-  //       </TableRow>
-
-  //       <TableRow>
-  //         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-  //           <Collapse in={openLine} timeout="auto" unmountOnExit>
-  //             <Box margin={1}>
-  //               <Table size="small" aria-label="purchases">
-  //                 <TableHead>
-  //                   <TableRow>
-  //                     <TableCell>Item</TableCell>
-  //                     <TableCell>Description</TableCell>
-  //                     <TableCell>Project</TableCell>
-  //                     <TableCell>Un</TableCell>
-  //                     <TableCell>Quantity</TableCell>
-  //                     <TableCell align="right">Amount</TableCell>
-  //                     <TableCell align="right">Total Price (MT)</TableCell>
-  //                   </TableRow>
-  //                 </TableHead>
-  //                 <TableBody>
-  //                   {itemVariants?.map(item => (
-  //                     <TableRow key={item.id}>
-  //                       <TableCell align="left">{row.code}</TableCell>
-  //                       <TableCell align="left">{row.description}</TableCell>
-  //                       <TableCell align="left">{row.project}</TableCell>
-  //                       <TableCell align="left">{row.unity}</TableCell>
-  //                       <TableCell align="right">{item.quantity}</TableCell>
-  //                       <TableCell align="right">{item.price}</TableCell>
-  //                       <TableCell align="right">{item.total}</TableCell>
-  //                       <TableCell align="right">
-  //                         <IconButton
-  //                           aria-label="Add Line To Invoice"
-  //                           onClick={() => {
-  //                             handleClickOpenPedding(row.id)
-  //                           }}
-  //                           color="inherit"
-  //                         >
-  //                           <ArrowBackIosIcon />
-  //                         </IconButton>
-  //                       </TableCell>
-  //                     </TableRow>
-  //                   ))}
-  //                 </TableBody>
-  //               </Table>
-  //             </Box>
-  //           </Collapse>
-  //         </TableCell>
-  //       </TableRow>
-  //     </React.Fragment>
-  //   )
-  // }
 
   function RowApproval(props: OrderItemProps) {
     const { row } = props
@@ -796,83 +677,13 @@ export default function OrderDetails({ order }) {
           </TabPanel>
           <TabPanel value="2">Item Three</TabPanel>
           <TabPanel value="3">
-            <OrderPedding order={order} id={id} />
+            <OrderPedding order={order} id={id.toString()} />
           </TabPanel>
 
           <TabPanel value="4">
-            <Card>
-              <CardHeader
-                avatar={
-                  <Avatar aria-label="recipe" className={classes.avatar}>
-                    A
-                  </Avatar>
-                }
-                title="Approval Items"
-                subheader="Select line Items to Approval"
-              />
-              <CardContent>
-                <Grid item xs={12} className={classes.root}>
-                  <TextField
-                    autoFocus
-                    margin="dense"
-                    id="peddingTotal"
-                    label="Total Amount"
-                    value={approvalTotalAmount}
-                    disabled
-                    fullWidth
-                  />
-
-                  <IconButton
-                    aria-label="Approve All"
-                    onClick={() => {
-                      handleClickApproveAll()
-                    }}
-                    color="inherit"
-                  >
-                    <ThumbDownAltIcon />
-                  </IconButton>
-                  <IconButton
-                    aria-label="Decline All"
-                    onClick={() => {
-                      handleClickDeclineAll()
-                    }}
-                    color="inherit"
-                  >
-                    <ThumbUpIcon />
-                  </IconButton>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <TableContainer component={Paper}>
-                    <Table className={classes.table} aria-label="Pedding Itens">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell align="left"></TableCell>
-                          <TableCell align="left">Item</TableCell>
-                          <TableCell align="left">Description</TableCell>
-                          <TableCell align="left">Project</TableCell>
-                          <TableCell align="left">UN</TableCell>
-                          <TableCell align="right">Quantity</TableCell>
-                          <TableCell align="right">Amount</TableCell>
-                          <TableCell align="right">Order</TableCell>
-                          <TableCell align="right">Total Pedding</TableCell>
-                          <TableCell align="right">Total Approval</TableCell>
-                          <TableCell align="right">Total Billed</TableCell>
-
-                          <TableCell align="right"></TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {approvalItens?.map(row => (
-                          <RowApproval key={row.id} row={row} />
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Grid>
-              </CardContent>
-            </Card>
+            <OrderApproval order={order} id={id.toString()} />
           </TabPanel>
+          <TabPanel value="5"></TabPanel>
           <TabPanel value="6"></TabPanel>
         </TabContext>
       </Paper>

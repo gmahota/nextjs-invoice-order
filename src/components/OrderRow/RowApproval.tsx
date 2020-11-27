@@ -16,15 +16,20 @@ import TableHead from '@material-ui/core/TableHead'
 import Order from '../../model/sales/order'
 import OrderItem from '../../model/sales/orderItem'
 import OrderItemVariant from './../../model/sales/orderItemVariant'
+import {
+  get_ApprovalItems,
+  get_RowTotalPedding,
+  get_RowTotalApproval,
+  get_RowTotalInvoice
+} from '../../service/sales/orderService'
 
 // Icons
-import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos'
-import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos'
+import ThumbUpIcon from '@material-ui/icons/ThumbUp'
+import ThumbDownAltIcon from '@material-ui/icons/ThumbDownAlt'
+
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import IconButton from '@material-ui/core/IconButton'
-
-
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -44,16 +49,30 @@ type OrderItemProps = {
   children?: React.ReactNode
   order: Order
   row: OrderItem
-  handleClickAddItem?: any
+  handleClickApproveAllRowVarients?: any
+  handleClickDeclineAllRowVarients?: any
+  handleClickApproveAll?: any
+  handleClickDeclineAll?: any
 }
-export const RowPedding = function RowPedding(props: OrderItemProps) {
-  const { row, order, handleClickAddItem } = props
+
+export const RowApproval = function RowApproval(props: OrderItemProps) {
+  const {
+    row,
+    order,
+    handleClickApproveAllRowVarients,
+    handleClickDeclineAllRowVarients,
+    handleClickApproveAll,
+    handleClickDeclineAll
+  } = props
+
   const [openLine, setOpenLine] = React.useState(false)
   const classes = useStyles()
 
-  const itemVariants: OrderItemVariant[] = order.items[row.id - 1]?.itemVarients
+  const itemVariants: OrderItemVariant[] = order.items[row.id - 1].itemVarients
 
-  const handleClickRemoveItem = (id: number) => {}
+  const totalPedding: number = get_RowTotalPedding(order, row.id - 1)
+  const totalApproval: number = get_RowTotalApproval(order, row.id - 1)
+  const totalInvoice: number = get_RowTotalInvoice(order, row.id - 1)
 
   return (
     <React.Fragment>
@@ -74,15 +93,27 @@ export const RowPedding = function RowPedding(props: OrderItemProps) {
         <TableCell align="right">{row.quantity}</TableCell>
         <TableCell align="right">{row.price}</TableCell>
         <TableCell align="right">{row.total}</TableCell>
+        <TableCell align="right">{totalPedding}</TableCell>
+        <TableCell align="right">{totalApproval}</TableCell>
+        <TableCell align="right">{totalInvoice}</TableCell>
         <TableCell align="right">
           <IconButton
             aria-label="Add Line To Invoice"
             onClick={() => {
-              handleClickAddItem(row.id)
+              handleClickApproveAll(row.id)
             }}
             color="inherit"
           >
-            <ArrowForwardIosIcon />
+            <ThumbDownAltIcon />
+          </IconButton>
+          <IconButton
+            aria-label="Add Line To Invoice"
+            onClick={() => {
+              handleClickDeclineAll(row.id)
+            }}
+            color="inherit"
+          >
+            <ThumbUpIcon />
           </IconButton>
         </TableCell>
       </TableRow>
@@ -115,13 +146,23 @@ export const RowPedding = function RowPedding(props: OrderItemProps) {
                       <TableCell align="right">{item.total}</TableCell>
                       <TableCell align="right">
                         <IconButton
-                          aria-label="Remove Item"
+                          aria-label="Add Line To Invoice"
                           onClick={() => {
-                            handleClickRemoveItem(row.id)
+                            handleClickApproveAllRowVarients(row.id)
                           }}
                           color="inherit"
                         >
-                          <ArrowBackIosIcon />
+                          <ThumbDownAltIcon />
+                        </IconButton>
+
+                        <IconButton
+                          aria-label="Add Line To Invoice"
+                          onClick={() => {
+                            handleClickDeclineAllRowVarients(row.id)
+                          }}
+                          color="inherit"
+                        >
+                          <ThumbUpIcon />
                         </IconButton>
                       </TableCell>
                     </TableRow>
