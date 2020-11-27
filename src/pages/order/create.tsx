@@ -140,7 +140,7 @@ function NumberFormatCustom(props: NumberFormatCustomProps) {
       }}
       thousandSeparator
       isNumericString
-    // prefix="$"
+      // prefix="$"
     />
   )
 }
@@ -269,7 +269,7 @@ export default function CreateOrder({ id }) {
       grossTotal: itemTotal,
       vatTotal: vatT,
       total: tot,
-      status: 'open'
+      status: 'pedding'
     }
 
     setGrossTotal(itemTotal)

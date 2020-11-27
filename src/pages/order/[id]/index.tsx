@@ -9,7 +9,11 @@ import OrderItem from '../../../model/sales/orderItem'
 import OrderItemVariant from '../../../model/sales/orderItemVariant'
 import {
   get_PeddingItems,
-  update_OrderPeddingStatus
+  set_OrderPeddingStatus,
+  get_ApprovalItems,
+  get_RowTotalPedding,
+  get_RowTotalApproval,
+  get_RowTotalInvoice
 } from '../../../service/sales/orderService'
 
 import { CustomerOptions } from '../../../model/base/customer'
@@ -63,6 +67,9 @@ import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos'
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos'
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
+
+import ThumbUpIcon from '@material-ui/icons/ThumbUp'
+import ThumbDownAltIcon from '@material-ui/icons/ThumbDownAlt'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -212,6 +219,11 @@ export default function OrderDetails({ order }) {
   const [openPedding, setOpenPedding] = useState(false)
   const [openLine, setOpenLine] = useState(false)
 
+  // Aproval
+  const [approvalTotalAmount, setApprovalTotalAmount] = useState(0)
+  const [openAproval, setOpenAproval] = useState(false)
+  const [openLineAproval, setOpenLineAproval] = useState(false)
+
   const [grossTotal, setGrossTotal] = useState(
     order.items?.reduce((sum, current) => sum + current.grossTotal, 0)
   )
@@ -250,12 +262,14 @@ export default function OrderDetails({ order }) {
 
   const peddingItens: OrderItem[] = get_PeddingItems(order)
 
+  const approvalItens: OrderItem[] = get_ApprovalItems(order)
+
   const handleSave = () => {
     // setOpen(true)
   }
 
   const handlePeddingSave = async () => {
-    update_OrderPeddingStatus(order)
+    set_OrderPeddingStatus(order)
 
     try {
       const res = await fetch(`/api/order/${id}/update`, {
@@ -372,6 +386,15 @@ export default function OrderDetails({ order }) {
     setOpenPedding(false)
   }
 
+  // Approval
+  const handleClickApproveAll = () => {}
+
+  const handleClickDeclineAll = () => {}
+
+  const handleClickApproveAllRowVarients = (rowNumber: number) => {}
+
+  const handleClickDeclineAllRowVarients = (rowNumber: number) => {}
+
   type OrderItemProps = {
     children?: React.ReactNode
     row?: OrderItem
@@ -466,6 +489,121 @@ export default function OrderDetails({ order }) {
     )
   }
 
+  function RowApproval(props: OrderItemProps) {
+    const { row } = props
+    const [openLine, setOpenLine] = React.useState(false)
+    const classes = useStyles()
+
+    const itemVariants: OrderItemVariant[] =
+      order.items[row.id - 1].itemVarients
+
+    const totalPedding: number = get_RowTotalPedding(order, row.id - 1)
+    const totalApproval: number = get_RowTotalApproval(order, row.id - 1)
+    const totalInvoice: number = get_RowTotalInvoice(order, row.id - 1)
+
+    return (
+      <React.Fragment>
+        <TableRow key={row.id} className={classes.root}>
+          <TableCell>
+            <IconButton
+              aria-label="expand row"
+              size="small"
+              onClick={() => setOpenLine(!openLine)}
+            >
+              {openLine ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            </IconButton>
+          </TableCell>
+          <TableCell align="left">{row.code}</TableCell>
+          <TableCell align="left">{row.description}</TableCell>
+          <TableCell align="left">{row.project}</TableCell>
+          <TableCell align="left">{row.unity}</TableCell>
+          <TableCell align="right">{row.quantity}</TableCell>
+          <TableCell align="right">{row.price}</TableCell>
+          <TableCell align="right">{row.total}</TableCell>
+          <TableCell align="right">{totalPedding}</TableCell>
+          <TableCell align="right">{totalApproval}</TableCell>
+          <TableCell align="right">{totalInvoice}</TableCell>
+          <TableCell align="right">
+            <IconButton
+              aria-label="Add Line To Invoice"
+              onClick={() => {
+                handleClickOpenPedding(row.id)
+              }}
+              color="inherit"
+            >
+              <ThumbDownAltIcon />
+            </IconButton>
+            <IconButton
+              aria-label="Add Line To Invoice"
+              onClick={() => {
+                handleClickOpenPedding(row.id)
+              }}
+              color="inherit"
+            >
+              <ThumbUpIcon />
+            </IconButton>
+          </TableCell>
+        </TableRow>
+
+        <TableRow>
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+            <Collapse in={openLine} timeout="auto" unmountOnExit>
+              <Box margin={1}>
+                <Table size="small" aria-label="purchases">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Item</TableCell>
+                      <TableCell>Description</TableCell>
+                      <TableCell>Project</TableCell>
+                      <TableCell>Un</TableCell>
+                      <TableCell>Quantity</TableCell>
+                      <TableCell align="right">Amount</TableCell>
+                      <TableCell align="right">Total Price (MT)</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {itemVariants?.map(item => (
+                      <TableRow key={item.id}>
+                        <TableCell align="left">{row.code}</TableCell>
+                        <TableCell align="left">{row.description}</TableCell>
+                        <TableCell align="left">{row.project}</TableCell>
+                        <TableCell align="left">{row.unity}</TableCell>
+                        <TableCell align="right">{item.quantity}</TableCell>
+                        <TableCell align="right">{item.price}</TableCell>
+                        <TableCell align="right">{item.total}</TableCell>
+                        <TableCell align="right">
+                          <IconButton
+                            aria-label="Add Line To Invoice"
+                            onClick={() => {
+                              handleClickApproveAllRowVarients(row.id)
+                            }}
+                            color="inherit"
+                          >
+                            <ThumbDownAltIcon />
+                          </IconButton>
+
+                          <IconButton
+                            aria-label="Add Line To Invoice"
+                            onClick={() => {
+                              handleClickDeclineAllRowVarients(row.id)
+                            }}
+                            color="inherit"
+                          >
+                            <ThumbUpIcon />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Box>
+            </Collapse>
+          </TableCell>
+        </TableRow>
+      </React.Fragment>
+    )
+  }
+
   return (
     <>
       <Paper square>
@@ -491,7 +629,7 @@ export default function OrderDetails({ order }) {
                 <CardHeader
                   avatar={
                     <Avatar aria-label="recipe" className={classes.avatar}>
-                      P
+                      O
                     </Avatar>
                   }
                   action={
@@ -774,7 +912,85 @@ export default function OrderDetails({ order }) {
             </Card>
           </TabPanel>
 
-          <TabPanel value="4">Item Three</TabPanel>
+          <TabPanel value="4">
+            <Card>
+              <CardHeader
+                avatar={
+                  <Avatar aria-label="recipe" className={classes.avatar}>
+                    A
+                  </Avatar>
+                }
+                action={
+                  <IconButton aria-label="add" onClick={handlePeddingSave}>
+                    <SaveIcon />
+                  </IconButton>
+                }
+                title="Approval Items"
+                subheader="Select line Items to Approval"
+              />
+              <CardContent>
+                <Grid item xs={12} className={classes.root}>
+                  <TextField
+                    autoFocus
+                    margin="dense"
+                    id="peddingTotal"
+                    label="Total Amount"
+                    value={approvalTotalAmount}
+                    disabled
+                    fullWidth
+                  />
+
+                  <IconButton
+                    aria-label="Approve All"
+                    onClick={() => {
+                      handleClickApproveAll()
+                    }}
+                    color="inherit"
+                  >
+                    <ThumbDownAltIcon />
+                  </IconButton>
+                  <IconButton
+                    aria-label="Decline All"
+                    onClick={() => {
+                      handleClickDeclineAll()
+                    }}
+                    color="inherit"
+                  >
+                    <ThumbUpIcon />
+                  </IconButton>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TableContainer component={Paper}>
+                    <Table className={classes.table} aria-label="Pedding Itens">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell align="left"></TableCell>
+                          <TableCell align="left">Item</TableCell>
+                          <TableCell align="left">Description</TableCell>
+                          <TableCell align="left">Project</TableCell>
+                          <TableCell align="left">UN</TableCell>
+                          <TableCell align="right">Quantity</TableCell>
+                          <TableCell align="right">Amount</TableCell>
+                          <TableCell align="right">Order</TableCell>
+                          <TableCell align="right">Total Pedding</TableCell>
+                          <TableCell align="right">Total Approval</TableCell>
+                          <TableCell align="right">Total Billed</TableCell>
+
+                          <TableCell align="right"></TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {approvalItens?.map(row => (
+                          <RowApproval key={row.id} row={row} />
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Grid>
+              </CardContent>
+            </Card>
+          </TabPanel>
           <TabPanel value="5">Item Three</TabPanel>
           <TabPanel value="6">Item Three</TabPanel>
         </TabContext>
