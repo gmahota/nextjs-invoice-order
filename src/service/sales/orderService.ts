@@ -11,8 +11,7 @@ const get_PeddingItems = (order: Order): OrderItem[] => {
 
 const get_ApprovalItems = (order: Order): OrderItem[] => {
   const items: OrderItem[] =
-    order.items?.filter(item => !item.status || item.status === 'approval') ||
-    []
+    order.items?.filter(item => item.status === 'approval') || []
 
   return items
 }
@@ -31,7 +30,11 @@ const set_OrderPeddingStatus = (order: Order) => {
     })
 }
 
-const set_OrderInvoiceStatus = (order: Order,rowNumber:number,varientNumber:number) => {
+const set_OrderInvoiceStatus = (
+  order: Order,
+  rowNumber: number,
+  varientNumber: number
+) => {
   order.items
     ?.filter(item => !item.status || item.status === 'pedding')
     .forEach(function (item) {
