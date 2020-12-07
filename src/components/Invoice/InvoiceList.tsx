@@ -26,22 +26,17 @@ import ThumbDownAltIcon from '@material-ui/icons/ThumbDownAlt'
 
 // Order
 import Order from './../../model/sales/order'
-import OrderItem from './../../model/sales/orderItem'
+import Invoice from './../../model/sales/invoice'
+import InvoiceItem from './../../model/sales/invoiceItem'
 import OrderItemVariant from './../../model/sales/orderItemVariant'
 import {
-  get_TotalApprovalItems,
-  get_ApprovalItems,
-  get_RowTotalPedding,
-  get_RowTotalApproval,
-  get_RowTotalInvoice
+  get_Invoices,
+  get_TotalInvoices
 } from '../../service/sales/orderService'
 
 import { red } from '@material-ui/core/colors'
 
-import { RowApproval } from './../OrderRow/RowApproval'
-
-// Icons
-import SaveIcon from '@material-ui/icons/Save'
+import { InvoiceRow } from './../InvoiceRow/invoiceRow'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -111,7 +106,7 @@ type OrderApprovalProps = {
   order: Order
   id?: string
 }
-export const OrderApproval = function OrderApproval(props: OrderApprovalProps) {
+export const InvoiceList = function InvoiceList(props: OrderApprovalProps) {
   const router = useRouter()
 
   const { order, id } = props
@@ -119,19 +114,12 @@ export const OrderApproval = function OrderApproval(props: OrderApprovalProps) {
   const classes = useStyles()
 
   // Aproval
-  const [approvalTotalAmount, setApprovalTotalAmount] = useState(
-    get_TotalApprovalItems(order)
-  )
+  const [total, setTotal] = useState(get_TotalInvoices(order))
 
-  const approvalItens: OrderItem[] = get_ApprovalItems(order)
   // Approval Functions
   const handleClickApproveAll = () => {}
 
   const handleClickDeclineAll = () => {}
-
-  const handleSave = async () => {
-    console.log('Ola')
-  }
 
   const handleClickApproveAllRowVarients = (rowNumber: number) => {}
 
@@ -145,7 +133,7 @@ export const OrderApproval = function OrderApproval(props: OrderApprovalProps) {
             A
           </Avatar>
         }
-        title="Approval Items"
+        title="List Invoices"
         subheader="Select line Items to Approval"
       />
       <CardContent>
@@ -154,33 +142,11 @@ export const OrderApproval = function OrderApproval(props: OrderApprovalProps) {
             autoFocus
             margin="dense"
             id="peddingTotal"
-            label="Total Amount"
-            value={approvalTotalAmount}
+            label="Total Billed"
+            value={total}
             disabled
             fullWidth
           />
-
-          <IconButton
-            aria-label="Approve All"
-            onClick={() => {
-              handleClickApproveAll()
-            }}
-            color="inherit"
-          >
-            <ThumbDownAltIcon />
-          </IconButton>
-          <IconButton
-            aria-label="Decline All"
-            onClick={() => {
-              handleClickDeclineAll()
-            }}
-            color="inherit"
-          >
-            <ThumbUpIcon />
-          </IconButton>
-          <IconButton aria-label="add" onClick={handleSave} color="inherit">
-            <SaveIcon />
-          </IconButton>
         </Grid>
 
         <Grid item xs={12}>
@@ -189,23 +155,16 @@ export const OrderApproval = function OrderApproval(props: OrderApprovalProps) {
               <TableHead>
                 <TableRow>
                   <TableCell align="left"></TableCell>
-                  <TableCell align="left">Item</TableCell>
-                  <TableCell align="left">Description</TableCell>
-                  <TableCell align="left">Project</TableCell>
-                  <TableCell align="left">UN</TableCell>
-                  <TableCell align="right">Quantity</TableCell>
-                  <TableCell align="right">Amount</TableCell>
-                  <TableCell align="right">Order</TableCell>
-                  <TableCell align="right">Total Pedding</TableCell>
-                  <TableCell align="right">Total Approval</TableCell>
-                  <TableCell align="right">Total Billed</TableCell>
-
-                  <TableCell align="right"></TableCell>
+                  <TableCell align="left">Order</TableCell>
+                  <TableCell align="left">Customer</TableCell>
+                  <TableCell align="left">Name</TableCell>
+                  <TableCell align="left">Total</TableCell>
+                  <TableCell align="right">Status</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {approvalItens?.map(row => (
-                  <RowApproval key={row.id} row={row} order={order} />
+                {order.Invoices?.map(row => (
+                  <InvoiceRow key={row.id} row={row} />
                 ))}
               </TableBody>
             </Table>

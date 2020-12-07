@@ -1,6 +1,24 @@
 import Order from '../../model/sales/order'
+import Invoice from '../../model/sales/invoice'
 import OrderItem from '../../model/sales/orderItem'
 import OrderItemVariant from '../../model/sales/orderItemVariant'
+
+const get_Invoices = (order: Order): Invoice[] => {
+  return order?.Invoices || []
+}
+
+const get_TotalInvoices = (order: Order): number => {
+  const items: Invoices[] = order.Invoices || []
+
+  let total = 0
+
+  for (let rowNumber = 0; rowNumber < items.length; rowNumber++) {
+    total +=
+      items[rowNumber].items.reduce((sum, current) => sum + current.total, 0) ||
+      0
+  }
+  return total
+}
 
 const get_PeddingItems = (order: Order): OrderItem[] => {
   const items: OrderItem[] =
@@ -14,6 +32,21 @@ const get_ApprovalItems = (order: Order): OrderItem[] => {
     order.items?.filter(item => item.status === 'approval') || []
 
   return items
+}
+
+const get_TotalApprovalItems = (order: Order): number => {
+  const items: OrderItem[] =
+    order.items?.filter(item => item.status === 'approval') || []
+
+  let total = 0
+
+  for (let rowNumber = 0; rowNumber < items.length; rowNumber++) {
+    total +=
+      order.items[rowNumber].itemVarients
+        ?.filter(item => !item.status || item.status === 'approval')
+        .reduce((sum, current) => sum + current.grossTotal, 0) || 0
+  }
+  return total
 }
 
 const set_OrderPeddingStatus = (order: Order) => {
@@ -71,9 +104,12 @@ const get_RowTotalInvoice = (order: Order, rowNumber: number): number => {
 }
 
 export {
+  get_Invoices,
+  get_TotalInvoices,
   get_PeddingItems,
   set_OrderPeddingStatus,
   get_ApprovalItems,
+  get_TotalApprovalItems,
   get_RowTotalPedding,
   get_RowTotalApproval,
   get_RowTotalInvoice

@@ -71,6 +71,7 @@ import ThumbDownAltIcon from '@material-ui/icons/ThumbDownAlt'
 
 import { OrderPedding } from './../../../components/Order/OrderPedding'
 import { OrderApproval } from './../../../components/Order/OrderApproval'
+import { InvoiceList } from './../../../components/Invoice/InvoiceList'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -563,7 +564,9 @@ export default function OrderDetails({ order }) {
           <TabPanel value="4">
             <OrderApproval order={order} id={id.toString()} />
           </TabPanel>
-          <TabPanel value="5"></TabPanel>
+          <TabPanel value="5">
+            <InvoiceList order={order} id={id.toString()} />
+          </TabPanel>
           <TabPanel value="6"></TabPanel>
         </TabContext>
       </Paper>
