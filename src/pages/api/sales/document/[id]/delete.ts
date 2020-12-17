@@ -1,5 +1,5 @@
 import { query as q } from 'faunadb'
-import { serverClient } from '../../../../../utils/fauna-auth'
+import { serverClient } from '../../../../../../utils/fauna-auth'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
