@@ -15,8 +15,8 @@ export default function ProductList() {
   return (
     <div>
       <h1>Product's List`</h1>
-      <p>OLa mundosssss sfsf sfdfg </p>
-      <Link href="+ Create">Create New</Link>
+
+      <Link href="/products/create">+Create New</Link>
 
       <table>
         <tr>
