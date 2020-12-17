@@ -8,7 +8,7 @@ const get_Invoices = (order: Order): Invoice[] => {
 }
 
 const get_TotalInvoices = (order: Order): number => {
-  const items: Invoices[] = order.Invoices || []
+  const items: Invoice[] = order.Invoices || []
 
   let total = 0
 
