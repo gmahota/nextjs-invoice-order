@@ -36,7 +36,7 @@ import {
 
 import { red } from '@material-ui/core/colors'
 
-import { InvoiceRow } from './../InvoiceRow/invoiceRow'
+import { InvoiceRow } from './../InvoiceRow/InvoiceRow'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
