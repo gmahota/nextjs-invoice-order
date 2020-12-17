@@ -1,5 +1,4 @@
-import OrderItemVariant from './orderItemVariant'
-interface OrderItem {
+interface SalesItem {
   id: number
   code: string
   description: string
@@ -12,7 +11,6 @@ interface OrderItem {
   status?: string
   project?: string
   vatCode?: string
-  itemVarients?: OrderItemVariant[]
 }
 
-export default OrderItem
+export default SalesItem

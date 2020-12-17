@@ -224,13 +224,12 @@ export default function CreateOrder({ id }) {
         body: JSON.stringify(order)
       })
       if (res.status === 200) {
-        Router.push('/')
+        Router.push('/order')
       } else {
         throw new Error(await res.text())
       }
     } catch (e: any) {
       console.error(e)
-      // setErrorMessage(e.message)
     }
   }
 
@@ -269,7 +268,8 @@ export default function CreateOrder({ id }) {
       price: itemPrice,
       grossTotal: itemTotal,
       vatTotal: vatT,
-      total: tot
+      total: tot,
+      status: 'pedding'
     }
 
     setGrossTotal(itemTotal)
