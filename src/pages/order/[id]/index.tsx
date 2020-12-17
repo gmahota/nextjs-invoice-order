@@ -317,12 +317,13 @@ export default function OrderDetails({ order }) {
               }}
               aria-label="simple tabs example"
             >
-              <Tab label="Document" value="1" />
-              <Tab label="Resume" value="2" />
-              <Tab label="Pedding" value="3" />
+              <Tab label="Qoute" value="1" />
+              <Tab label="Qoute Resume" value="2" />
+              <Tab label="Pending Qoute" value="3" />
               <Tab label="Approval" value="4" />
-              <Tab label="Invoices" value="5" />
-              <Tab label="Other's" value="6" />
+              <Tab label="GR" value="5" />
+              <Tab label="Invoices" value="6" />
+              <Tab label="Other's" value="7" />
             </TabList>
           </AppBar>
           <TabPanel value="1">
@@ -564,10 +565,11 @@ export default function OrderDetails({ order }) {
           <TabPanel value="4">
             <OrderApproval order={order} id={id.toString()} />
           </TabPanel>
-          <TabPanel value="5">
+          <TabPanel value="5"></TabPanel>
+          <TabPanel value="6">
             <InvoiceList order={order} id={id.toString()} />
           </TabPanel>
-          <TabPanel value="6"></TabPanel>
+          <TabPanel value="7"></TabPanel>
         </TabContext>
       </Paper>
 
