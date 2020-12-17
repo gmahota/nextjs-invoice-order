@@ -24,8 +24,6 @@ import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import IconButton from '@material-ui/core/IconButton'
 
-
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {

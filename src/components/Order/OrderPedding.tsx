@@ -115,7 +115,6 @@ export const OrderPedding = function OrderPedding(props: OrderPeddingProps) {
   const [selectedItem, setSelectedItem] = useState<OrderItem>(null)
   const [totalAmount, setTotalAmount] = useState(0)
   const [openDialog, setOpenDialog] = useState(false)
-  const [openLine, setOpenLine] = useState(false)
 
   const peddingItens: OrderItem[] = get_PeddingItems(order)
 

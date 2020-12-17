@@ -104,7 +104,6 @@ const useStyles = makeStyles((theme: Theme) =>
     }
   })
 )
-
 interface ProductOptions {
   inputValue?: string
   code: string

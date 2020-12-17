@@ -16,13 +16,6 @@ import TableHead from '@material-ui/core/TableHead'
 import Invoice from '../../model/sales/invoice'
 import InvoiceItem from '../../model/sales/invoiceItem'
 
-import {
-  get_ApprovalItems,
-  get_RowTotalPedding,
-  get_RowTotalApproval,
-  get_RowTotalInvoice
-} from '../../service/sales/orderService'
-
 // Icons
 import ThumbUpIcon from '@material-ui/icons/ThumbUp'
 import ThumbDownAltIcon from '@material-ui/icons/ThumbDownAlt'
