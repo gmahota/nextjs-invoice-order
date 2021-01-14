@@ -1,0 +1,5 @@
+type Project {
+  code: string
+  description: string
+  status: string
+}
