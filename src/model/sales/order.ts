@@ -7,7 +7,7 @@ interface Order {
   customer: string
   name: string
   vat: string
-  status: string
+  status?: string
   total: number
   items: OrderItem[]
   Invoices?: Invoice[]
