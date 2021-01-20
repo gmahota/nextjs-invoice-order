@@ -264,334 +264,343 @@ export default function CreateOrder({
   }
 
   return (
-    <Card>
-      <CardHeader
-        avatar={
-          <Avatar aria-label="recipe" className={classes.avatar}>
-            P
-          </Avatar>
-        }
-        action={
-          <IconButton aria-label="add" onClick={handleClickOpen}>
-            <AddCircle />
-          </IconButton>
-        }
-        title={title}
-        subheader={date}
-      />
-      <CardContent>
-        <form className={classes.root}>
-          <Grid container>
-            <Grid item xs={8}>
+    <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded">
+      <Card>
+        <CardHeader
+          avatar={
+            <Avatar aria-label="recipe" className={classes.avatar}>
+              P
+            </Avatar>
+          }
+          action={
+            <IconButton aria-label="add" onClick={handleClickOpen}>
+              <AddCircle />
+            </IconButton>
+          }
+          title={title}
+          subheader={date}
+        />
+        <CardContent>
+          <form className={classes.root}>
+            <div className="grid-rows-3 grid-flow-col">
               <div>
-                <Autocomplete
-                  id="customer_code"
-                  options={allCustomers}
-                  getOptionLabel={option => option.name}
-                  style={{ width: 600 }}
-                  renderInput={params => (
-                    <TextField
-                      {...params}
-                      label="Customer"
-                      variant="outlined"
-                    />
-                  )}
-                  onChange={(event: any, newValue: CustomerOptions | null) => {
-                    if (newValue!) {
-                      setCustomer(newValue.id)
-                      setName(newValue.name)
-                      setVat(newValue.vat)
-                      setAddress(newValue.address)
-                      setDocument('')
-                    } else {
-                      setCustomer('')
-                      setName('')
-                      setVat('')
-                      setAddress('')
-                      setDocument('')
-                    }
-                  }}
-                />
+                <div>
+                  <Autocomplete
+                    id="customer_code"
+                    options={allCustomers}
+                    getOptionLabel={option => option.name}
+                    style={{ width: 600 }}
+                    renderInput={params => (
+                      <TextField
+                        {...params}
+                        label="Customer"
+                        variant="outlined"
+                      />
+                    )}
+                    onChange={(
+                      event: any,
+                      newValue: CustomerOptions | null
+                    ) => {
+                      if (newValue!) {
+                        setCustomer(newValue.id)
+                        setName(newValue.name)
+                        setVat(newValue.vat)
+                        setAddress(newValue.address)
+                        setDocument('')
+                      } else {
+                        setCustomer('')
+                        setName('')
+                        setVat('')
+                        setAddress('')
+                        setDocument('')
+                      }
+                    }}
+                  />
 
-                <TextField
-                  label="Name"
-                  type="text"
-                  value={name}
-                  autoFocus
-                  margin="dense"
-                  id="name"
-                  multiline
-                  rowsMax={4}
-                  onChange={event => setName(event.target.value)}
-                />
+                  <TextField
+                    label="Name"
+                    type="text"
+                    value={name}
+                    autoFocus
+                    margin="dense"
+                    id="name"
+                    multiline
+                    rowsMax={4}
+                    onChange={event => setName(event.target.value)}
+                  />
 
-                <TextField
-                  label="Nr. VAT"
-                  type="text"
-                  value={vat}
-                  autoFocus
-                  margin="dense"
-                  id="vat"
-                  multiline
-                  rowsMax={4}
-                  onChange={event => setVat(event.target.value)}
-                />
+                  <TextField
+                    label="Nr. VAT"
+                    type="text"
+                    value={vat}
+                    autoFocus
+                    margin="dense"
+                    id="vat"
+                    multiline
+                    rowsMax={4}
+                    onChange={event => setVat(event.target.value)}
+                  />
+                </div>
               </div>
+
               <div>
-                <TextField
-                  label="Address"
-                  type="text"
-                  value={address}
-                  autoFocus
-                  margin="dense"
-                  id="address"
-                  multiline
-                  rowsMax={4}
-                  onChange={event => setAddress(event.target.value)}
-                />
+                <div>
+                  <TextField
+                    label="Address"
+                    type="text"
+                    value={address}
+                    autoFocus
+                    margin="dense"
+                    id="address"
+                    multiline
+                    rowsMax={4}
+                    onChange={event => setAddress(event.target.value)}
+                  />
 
-                <TextField
-                  label="Document"
-                  type="text"
-                  value={document}
-                  autoFocus
-                  margin="dense"
-                  id="document"
-                  multiline
-                  rowsMax={4}
-                  onChange={event => setDocument(event.target.value)}
-                />
+                  <TextField
+                    label="Document"
+                    type="text"
+                    value={document}
+                    autoFocus
+                    margin="dense"
+                    id="document"
+                    multiline
+                    rowsMax={4}
+                    onChange={event => setDocument(event.target.value)}
+                  />
+                </div>
               </div>
-            </Grid>
-            <Grid item xs={4} className={classes.totalArea}>
-              <TextField
-                autoFocus
-                margin="dense"
-                id="grossTotal"
-                label="Gross Total"
-                value={grossTotal}
-                disabled
-                fullWidth
-              />
 
-              <TextField
-                autoFocus
-                margin="dense"
-                id="vatTotal"
-                label="Vat Total"
-                value={vatTotal}
-                disabled
-                fullWidth
-              />
-
-              <TextField
-                autoFocus
-                margin="dense"
-                id="Total"
-                label="Total"
-                value={total}
-                disabled
-                fullWidth
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <TableContainer component={Paper}>
-                <Table className={classes.table} aria-label="simple table">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>#</TableCell>
-                      <TableCell align="left">Item</TableCell>
-                      <TableCell align="left">Description</TableCell>
-                      <TableCell align="left">Project</TableCell>
-                      <TableCell align="left">UN</TableCell>
-                      <TableCell align="right">Quantity</TableCell>
-                      <TableCell align="right">Price</TableCell>
-                      <TableCell align="right">Total</TableCell>
-                      <TableCell align="right"></TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {items.map(row => (
-                      <TableRow key={row.id}>
-                        <TableCell component="th" scope="row">
-                          {row.id}
-                        </TableCell>
-                        <TableCell align="left">{row.code}</TableCell>
-                        <TableCell align="left">{row.description}</TableCell>
-                        <TableCell align="left">{row.project}</TableCell>
-                        <TableCell align="left">{row.unity}</TableCell>
-                        <TableCell align="right">{row.quantity}</TableCell>
-                        <TableCell align="right">{row.price}</TableCell>
-                        <TableCell align="right">{row.total}</TableCell>
+              <div>
+                <TableContainer component={Paper}>
+                  <Table className={classes.table} aria-label="simple table">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>#</TableCell>
+                        <TableCell align="left">Item</TableCell>
+                        <TableCell align="left">Description</TableCell>
+                        <TableCell align="left">Project</TableCell>
+                        <TableCell align="left">UN</TableCell>
+                        <TableCell align="right">Quantity</TableCell>
+                        <TableCell align="right">Price</TableCell>
+                        <TableCell align="right">Total</TableCell>
+                        <TableCell align="right"></TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Grid>
-          </Grid>
-        </form>
-      </CardContent>
+                    </TableHead>
+                    <TableBody>
+                      {items.map(row => (
+                        <TableRow key={row.id}>
+                          <TableCell component="th" scope="row">
+                            {row.id}
+                          </TableCell>
+                          <TableCell align="left">{row.code}</TableCell>
+                          <TableCell align="left">{row.description}</TableCell>
+                          <TableCell align="left">{row.project}</TableCell>
+                          <TableCell align="left">{row.unity}</TableCell>
+                          <TableCell align="right">{row.quantity}</TableCell>
+                          <TableCell align="right">{row.price}</TableCell>
+                          <TableCell align="right">{row.total}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </div>
 
-      <CardActions disableSpacing>
-        <Button variant="outlined" color="primary" onClick={handleSave}>
-          Save
-        </Button>
+              <div className="rounded-lg">
+                <TextField
+                  autoFocus
+                  margin="dense"
+                  id="grossTotal"
+                  label="Gross Total"
+                  value={grossTotal}
+                  disabled
+                  fullWidth
+                />
 
-        <Button variant="outlined" color="primary" onClick={handleCancel}>
-          Cancel
-        </Button>
-      </CardActions>
+                <TextField
+                  autoFocus
+                  margin="dense"
+                  id="vatTotal"
+                  label="Vat Total"
+                  value={vatTotal}
+                  disabled
+                  fullWidth
+                />
 
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="form-dialog-title"
-      >
-        <DialogTitle id="form-dialog-title">Document Item</DialogTitle>
-        <DialogContent>
-          <DialogContentText>Add new Item.</DialogContentText>
+                <TextField
+                  autoFocus
+                  margin="dense"
+                  id="Total"
+                  label="Total"
+                  value={total}
+                  disabled
+                  fullWidth
+                />
+              </div>
+            </div>
+          </form>
+        </CardContent>
 
-          <Autocomplete
-            id="product_code"
-            options={allProducts}
-            getOptionLabel={option => {
-              // Value selected with enter, right from the input
-              if (typeof option === 'string') {
-                return option
-              }
-              // Add "xxx" option created dynamically
-              if (option.inputValue) {
-                return option.inputValue
-              }
-              // Regular option
-              return option.code
-            }}
-            value={itemCode}
-            renderOption={option => option.code}
-            renderInput={params => (
-              <TextField {...params} label="Code" type="text" fullWidth />
-            )}
-            onChange={(event: any, newValue: ProductOptions | null) => {
-              if (newValue!) {
-                setItemCode(newValue.code)
-                setItemDescription(newValue.description)
-                setItemPrice(newValue.price)
-              } else {
-                setItemCode('')
-                setItemDescription('')
-                setItemPrice(0)
-                setItemQuantity(0)
-                setItemTotal(0)
-              }
-            }}
-          />
+        <CardActions disableSpacing>
+          <Button variant="outlined" color="primary" onClick={handleSave}>
+            Save
+          </Button>
 
-          <TextField
-            autoFocus
-            margin="dense"
-            id="description"
-            label="Description"
-            type="text"
-            value={itemDescription}
-            onChange={event => setItemDescription(event.target.value)}
-            fullWidth
-          />
-
-          <Autocomplete
-            id="itemProject"
-            options={allProjects}
-            getOptionLabel={option => {
-              // Value selected with enter, right from the input
-              if (typeof option === 'string') {
-                return option
-              }
-              // Add "xxx" option created dynamically
-              if (option.inputValue) {
-                return option.inputValue
-              }
-              // Regular option
-              return option.code
-            }}
-            value={itemProject}
-            renderOption={option => option.code}
-            renderInput={params => (
-              <TextField {...params} label="Project" type="text" fullWidth />
-            )}
-            onChange={(event: any, newValue: ProjectOptions | null) => {
-              if (newValue!) {
-                setItemProject(newValue.code)
-              } else {
-                setItemProject('')
-              }
-            }}
-          />
-
-          <TextField
-            autoFocus
-            margin="dense"
-            id="unity"
-            label="Unity"
-            type="text"
-            value={itemUnity}
-            onChange={event => setItemUnity(event.target.value)}
-            fullWidth
-          />
-          <TextField
-            autoFocus
-            margin="dense"
-            id="quantity"
-            label="Quantity"
-            value={itemQuantity}
-            onChange={event => {
-              setItemQuantity(parseInt(event.target.value))
-              setItemTotal(parseInt(event.target.value) * itemPrice)
-            }}
-            InputProps={{
-              inputComponent: NumberFormatCustom as any
-            }}
-            fullWidth
-          />
-          <TextField
-            label="Price"
-            value={itemPrice}
-            onChange={event => {
-              setItemPrice(parseInt(event.target.value))
-              setItemTotal(parseInt(event.target.value) * itemQuantity)
-            }}
-            name="price"
-            id="price"
-            InputProps={{
-              inputComponent: NumberFormatCustom as any
-            }}
-            fullWidth
-          />
-          <TextField
-            id="total"
-            label="Total"
-            InputLabelProps={{
-              shrink: true
-            }}
-            value={itemTotal}
-            onChange={event => setItemTotal(parseInt(event.target.value))}
-            fullWidth
-            InputProps={{
-              inputComponent: NumberFormatCustom as any
-            }}
-            disabled
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="primary">
+          <Button variant="outlined" color="primary" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button onClick={handleItemAdd} color="primary">
-            Add
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Card>
+        </CardActions>
+
+        <Dialog
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="form-dialog-title"
+        >
+          <DialogTitle id="form-dialog-title">Document Item</DialogTitle>
+          <DialogContent>
+            <DialogContentText>Add new Item.</DialogContentText>
+
+            <Autocomplete
+              id="product_code"
+              options={allProducts}
+              getOptionLabel={option => {
+                // Value selected with enter, right from the input
+                if (typeof option === 'string') {
+                  return option
+                }
+                // Add "xxx" option created dynamically
+                if (option.inputValue) {
+                  return option.inputValue
+                }
+                // Regular option
+                return option.code
+              }}
+              value={itemCode}
+              renderOption={option => option.code}
+              renderInput={params => (
+                <TextField {...params} label="Code" type="text" fullWidth />
+              )}
+              onChange={(event: any, newValue: ProductOptions | null) => {
+                if (newValue!) {
+                  setItemCode(newValue.code)
+                  setItemDescription(newValue.description)
+                  setItemPrice(newValue.price)
+                } else {
+                  setItemCode('')
+                  setItemDescription('')
+                  setItemPrice(0)
+                  setItemQuantity(0)
+                  setItemTotal(0)
+                }
+              }}
+            />
+
+            <TextField
+              autoFocus
+              margin="dense"
+              id="description"
+              label="Description"
+              type="text"
+              value={itemDescription}
+              onChange={event => setItemDescription(event.target.value)}
+              fullWidth
+            />
+
+            <Autocomplete
+              id="itemProject"
+              options={allProjects}
+              getOptionLabel={option => {
+                // Value selected with enter, right from the input
+                if (typeof option === 'string') {
+                  return option
+                }
+                // Add "xxx" option created dynamically
+                if (option.inputValue) {
+                  return option.inputValue
+                }
+                // Regular option
+                return option.code
+              }}
+              value={itemProject}
+              renderOption={option => option.code}
+              renderInput={params => (
+                <TextField {...params} label="Project" type="text" fullWidth />
+              )}
+              onChange={(event: any, newValue: ProjectOptions | null) => {
+                if (newValue!) {
+                  setItemProject(newValue.code)
+                } else {
+                  setItemProject('')
+                }
+              }}
+            />
+
+            <TextField
+              autoFocus
+              margin="dense"
+              id="unity"
+              label="Unity"
+              type="text"
+              value={itemUnity}
+              onChange={event => setItemUnity(event.target.value)}
+              fullWidth
+            />
+            <TextField
+              autoFocus
+              margin="dense"
+              id="quantity"
+              label="Quantity"
+              value={itemQuantity}
+              onChange={event => {
+                setItemQuantity(parseInt(event.target.value))
+                setItemTotal(parseInt(event.target.value) * itemPrice)
+              }}
+              InputProps={{
+                inputComponent: NumberFormatCustom as any
+              }}
+              fullWidth
+            />
+            <TextField
+              label="Price"
+              value={itemPrice}
+              onChange={event => {
+                setItemPrice(parseInt(event.target.value))
+                setItemTotal(parseInt(event.target.value) * itemQuantity)
+              }}
+              name="price"
+              id="price"
+              InputProps={{
+                inputComponent: NumberFormatCustom as any
+              }}
+              fullWidth
+            />
+            <TextField
+              id="total"
+              label="Total"
+              InputLabelProps={{
+                shrink: true
+              }}
+              value={itemTotal}
+              onChange={event => setItemTotal(parseInt(event.target.value))}
+              fullWidth
+              InputProps={{
+                inputComponent: NumberFormatCustom as any
+              }}
+              disabled
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={handleItemAdd} color="primary">
+              Add
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Card>
+    </div>
   )
 }
 
