@@ -1,0 +1,5 @@
+type Product {
+  code: string
+  description: string
+  status: string
+}

@@ -1,4 +1,4 @@
-interface Customer {
+class Customer {
   id: number
   code: string
   name: string
@@ -6,7 +6,7 @@ interface Customer {
   address: string
 }
 
-interface CustomerOptions {
+class CustomerOptions {
   inputValue?: string
   code: string
   name: string
@@ -14,4 +14,4 @@ interface CustomerOptions {
   address: string
 }
 
-export type { Customer, CustomerOptions }
+export { Customer, CustomerOptions }

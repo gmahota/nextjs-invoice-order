@@ -4,7 +4,11 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
 
 import Order from '../../model/sales/order'
 import OrderItem from '../../model/sales/orderItem'
-import { CustomerOptions, Customer } from '../../model/base/customer'
+import { CustomerOptions } from '../../model/base/customer'
+import { get_Customers } from '../../service/base/customerService'
+import { get_Products } from '../../service/base/productService'
+import { get_Projects } from '../../service/base/projectService'
+import { create_Order } from '../../service/sales/orderService'
 
 import Moment from 'react-moment'
 import moment from 'moment'
@@ -144,7 +148,12 @@ function NumberFormatCustom(props: NumberFormatCustomProps) {
   )
 }
 
-export default function CreateOrder({ id }) {
+export default function CreateOrder({
+  id,
+  allCustomers,
+  allProducts,
+  allProjects
+}) {
   const router = useRouter()
 
   const classes = useStyles()
@@ -173,32 +182,9 @@ export default function CreateOrder({ id }) {
   const [grossTotal, setGrossTotal] = useState(0)
   const [vatTotal, setVatTotal] = useState(0)
   const [total, setTotal] = useState(0)
-
-  // Top 100 films as rated by IMDb users. http://www.imdb.com/chart/top
-  const productList: ProductOptions[] = [
-    { code: 'A001', description: 'Teste', price: 1000 },
-    { code: 'A002', description: 'Teste 2', price: 2000 }
-  ]
-
-  const projectList: ProjectOptions[] = [
-    { code: 'P001', description: 'Teste' },
-    { code: 'P002', description: 'Teste 2' }
-  ]
-
-  const customerList: CustomerOptions[] = [
-    {
-      code: 'C001',
-      name: 'Vercel,LDA',
-      vat: '411411',
-      address: 'Beira'
-    },
-    {
-      code: 'C002',
-      name: 'Node.js, SA',
-      vat: '411412',
-      address: 'Maputo'
-    }
-  ]
+  const [customerList, setCustomerList] = useState<CustomerOptions[]>(
+    allCustomers
+  )
 
   const handleSave = async () => {
     // setOpen(true)
@@ -214,22 +200,13 @@ export default function CreateOrder({ id }) {
       items: items
     }
 
-    try {
-      const res = await fetch('/api/order/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(order)
-      })
-      if (res.status === 200) {
-        Router.push('/order')
-      } else {
-        throw new Error(await res.text())
-      }
-    } catch (e: any) {
-      console.error(e)
-    }
+    create_Order(order)
+
+    // if (res?.status === 200) {
+    //   Router.push('/order')
+    // } else {
+    //   throw new Error((await res?.text()) || 'error')
+    // }
   }
 
   const handleClickOpen = () => {
@@ -252,7 +229,7 @@ export default function CreateOrder({ id }) {
     router.push('/order')
   }
 
-  const handleItemAdd = () => {
+  const handleItemAdd = async () => {
     const vatT: number =
       Number.parseFloat(itemTotal.toString()) * Number.parseFloat('0.17')
     const tot: number = Number.parseFloat(itemTotal.toString()) + vatT
@@ -309,28 +286,19 @@ export default function CreateOrder({ id }) {
               <div>
                 <Autocomplete
                   id="customer_code"
-                  options={customerList}
-                  getOptionLabel={option => {
-                    // Value selected with enter, right from the input
-                    if (typeof option === 'string') {
-                      return option
-                    }
-                    // Add "xxx" option created dynamically
-                    if (option.inputValue) {
-                      return option.inputValue
-                    }
-                    // Regular option
-                    return option.name
-                  }}
-                  value={customer}
-                  style={{ width: 300 }}
-                  renderOption={option => option.code}
+                  options={allCustomers}
+                  getOptionLabel={option => option.name}
+                  style={{ width: 600 }}
                   renderInput={params => (
-                    <TextField {...params} label="Customer" type="text" />
+                    <TextField
+                      {...params}
+                      label="Customer"
+                      variant="outlined"
+                    />
                   )}
                   onChange={(event: any, newValue: CustomerOptions | null) => {
                     if (newValue!) {
-                      setCustomer(newValue.code)
+                      setCustomer(newValue.id)
                       setName(newValue.name)
                       setVat(newValue.vat)
                       setAddress(newValue.address)
@@ -487,7 +455,7 @@ export default function CreateOrder({ id }) {
 
           <Autocomplete
             id="product_code"
-            options={productList}
+            options={allProducts}
             getOptionLabel={option => {
               // Value selected with enter, right from the input
               if (typeof option === 'string') {
@@ -533,7 +501,7 @@ export default function CreateOrder({ id }) {
 
           <Autocomplete
             id="itemProject"
-            options={projectList}
+            options={allProjects}
             getOptionLabel={option => {
               // Value selected with enter, right from the input
               if (typeof option === 'string') {
@@ -625,4 +593,41 @@ export default function CreateOrder({ id }) {
       </Dialog>
     </Card>
   )
+}
+
+export const getStaticProps = async () => {
+  const customers = await get_Customers()
+
+  const allCustomers = customers.map(customer => {
+    const c: CustomerOptions = {
+      ...customer
+    }
+    return c
+  })
+
+  const products = await get_Products()
+
+  const allProducts = products.map(product => {
+    const p: ProductOptions = {
+      ...product
+    }
+    return p
+  })
+
+  const projects = await get_Projects()
+
+  const allProjects = projects.map(project => {
+    const p: ProjectOptions = {
+      ...project
+    }
+    return p
+  })
+
+  return {
+    props: {
+      allCustomers,
+      allProducts,
+      allProjects
+    }
+  }
 }

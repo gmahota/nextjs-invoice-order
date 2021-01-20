@@ -3,6 +3,27 @@ import Invoice from '../../model/sales/invoice'
 import OrderItem from '../../model/sales/orderItem'
 import OrderItemVariant from '../../model/sales/orderItemVariant'
 
+const create_Order = (order: Order) => {
+  try {
+    const url =
+      process.env.NODE_ENV === 'development'
+        ? process.env.SERVER_URI
+        : `https://${process.env.VERCEL_URL}`
+
+    const res = fetch(url + '/api/orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(order)
+    })
+
+    return res
+  } catch (e: any) {
+    console.error(e)
+  }
+}
+
 const get_Invoices = (order: Order): Invoice[] => {
   return order?.Invoices || []
 }
@@ -104,6 +125,7 @@ const get_RowTotalInvoice = (order: Order, rowNumber: number): number => {
 }
 
 export {
+  create_Order,
   get_Invoices,
   get_TotalInvoices,
   get_PeddingItems,
