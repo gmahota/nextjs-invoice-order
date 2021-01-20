@@ -126,92 +126,96 @@ export default function OrderList() {
   }
 
   return (
-    <Card>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography className={classes.title} variant="h6" noWrap>
-            Order List
-          </Typography>
-          <div className={classes.search}>
-            <div className={classes.searchIcon}>
-              <Search />
+    <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded">
+      <Card>
+        <AppBar position="static">
+          <Toolbar>
+            <Typography className={classes.title} variant="h6" noWrap>
+              Order List
+            </Typography>
+            <div className={classes.search}>
+              <div className={classes.searchIcon}>
+                <Search />
+              </div>
+              <InputBase
+                placeholder="Search…"
+                classes={{
+                  root: classes.inputRoot,
+                  input: classes.inputInput
+                }}
+                inputProps={{ 'aria-label': 'search' }}
+                value={filterStr}
+                onChange={event =>
+                  setFilterStr(event.target.value.toLowerCase())
+                }
+              />
             </div>
-            <InputBase
-              placeholder="Search…"
-              classes={{
-                root: classes.inputRoot,
-                input: classes.inputInput
-              }}
-              inputProps={{ 'aria-label': 'search' }}
-              value={filterStr}
-              onChange={event => setFilterStr(event.target.value.toLowerCase())}
-            />
-          </div>
-          <div className={classes.grow} />
+            <div className={classes.grow} />
 
-          <div className={classes.sectionDesktop}>
-            <IconButton
-              aria-label="Create New Order"
-              onClick={handleNewOrder}
-              color="inherit"
-            >
-              <AddCircle />
-            </IconButton>
-          </div>
-          <div className={classes.sectionMobile}>
-            <IconButton
-              aria-label="Create New Order"
-              onClick={handleNewOrder}
-              color="inherit"
-            >
-              <AddCircle />
-            </IconButton>
-          </div>
-        </Toolbar>
-      </AppBar>
-      <CardHeader></CardHeader>
-      <Grid container>
-        <Grid item xs={12}>
-          <TableContainer component={Paper}>
-            <Table className={classes.table} aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell align="left">#</TableCell>
-                  <TableCell align="left">Order</TableCell>
-                  <TableCell align="left">Customer</TableCell>
-                  <TableCell align="left">Name</TableCell>
-                  <TableCell align="left">Total</TableCell>
-                  <TableCell align="right">Status</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {data
-                  ?.filter(
-                    e =>
-                      filterStr.length === 0 ||
-                      e.code?.toLowerCase().includes(filterStr) ||
-                      e.customer?.toLowerCase().includes(filterStr) ||
-                      e.name?.toLowerCase().includes(filterStr)
-                  )
-                  .map(row => (
-                    <TableRow key={row.ref['@ref'].id}>
-                      <TableCell align="left">
-                        <Link href={`/order/${row.ref['@ref'].id}`}>
-                          <DetailsOutlined />
-                        </Link>
-                      </TableCell>
-                      <TableCell align="left">{row.data.code}</TableCell>
-                      <TableCell align="left">{row.data.customer}</TableCell>
-                      <TableCell align="left">{row.data.name}</TableCell>
-                      <TableCell align="left">{row.data.total}</TableCell>
-                      <TableCell align="right">{row.data.status}</TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+            <div className={classes.sectionDesktop}>
+              <IconButton
+                aria-label="Create New Order"
+                onClick={handleNewOrder}
+                color="inherit"
+              >
+                <AddCircle />
+              </IconButton>
+            </div>
+            <div className={classes.sectionMobile}>
+              <IconButton
+                aria-label="Create New Order"
+                onClick={handleNewOrder}
+                color="inherit"
+              >
+                <AddCircle />
+              </IconButton>
+            </div>
+          </Toolbar>
+        </AppBar>
+        <CardHeader></CardHeader>
+        <Grid container>
+          <Grid item xs={12}>
+            <TableContainer component={Paper}>
+              <Table className={classes.table} aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="left">#</TableCell>
+                    <TableCell align="left">Order</TableCell>
+                    <TableCell align="left">Customer</TableCell>
+                    <TableCell align="left">Name</TableCell>
+                    <TableCell align="left">Total</TableCell>
+                    <TableCell align="right">Status</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {data
+                    ?.filter(
+                      e =>
+                        filterStr.length === 0 ||
+                        e.code?.toLowerCase().includes(filterStr) ||
+                        e.customer?.toLowerCase().includes(filterStr) ||
+                        e.name?.toLowerCase().includes(filterStr)
+                    )
+                    .map(row => (
+                      <TableRow key={row.ref['@ref'].id}>
+                        <TableCell align="left">
+                          <Link href={`/order/${row.ref['@ref'].id}`}>
+                            <DetailsOutlined />
+                          </Link>
+                        </TableCell>
+                        <TableCell align="left">{row.data.code}</TableCell>
+                        <TableCell align="left">{row.data.customer}</TableCell>
+                        <TableCell align="left">{row.data.name}</TableCell>
+                        <TableCell align="left">{row.data.total}</TableCell>
+                        <TableCell align="right">{row.data.status}</TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
         </Grid>
-      </Grid>
-    </Card>
+      </Card>
+    </div>
   )
 }

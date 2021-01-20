@@ -2,6 +2,7 @@ import React from 'react'
 import Head from 'next/head'
 
 import { Link } from '@material-ui/core'
+import Navbar from '../components/Navbar/Navbar'
 
 const Home: React.FC = () => {
   return (

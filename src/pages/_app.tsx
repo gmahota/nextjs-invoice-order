@@ -1,17 +1,29 @@
 import React from 'react'
 import { AppProps } from 'next/app'
-
-import { ThemeProvider } from 'styled-components'
-import GlobalStyle from '../styles/global'
-import theme from '../styles/theme'
+import { Layout } from './../components/Layout/Layout'
 import 'moment-timezone'
 
+import 'tailwindcss/tailwind.css'
+import '../styles/global.css'
+
+import '@fortawesome/fontawesome-free/css/all.min.css'
 const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
   return (
-    <ThemeProvider theme={theme}>
+    <Layout>
       <Component {...pageProps} />
-      <GlobalStyle />
-    </ThemeProvider>
+      {/*
+      Tailwind's normalize isn't applied
+      thus 8px margin is added around "body".
+      Fix it with a global style.
+      https://github.com/zeit/next.js/issues/151#issuecomment-257090939 */}
+      <style jsx global>{`
+        body {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+      `}</style>
+    </Layout>
   )
 }
 
