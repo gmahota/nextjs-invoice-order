@@ -1,4 +1,5 @@
 import React from 'react'
+import PageTitle from '../PageTitle/PageTitle'
 import UserDropdown from './../UserDropdown/UserDropdown'
 
 export default function Navbar({ fixed }) {
@@ -9,13 +10,7 @@ export default function Navbar({ fixed }) {
       <nav className="absolute top-0 left-0 w-full z-10 bg-transparent md:flex-row md:flex-no-wrap md:justify-start flex items-center p-4">
         <div className="w-full mx-autp items-center flex justify-between md:flex-no-wrap flex-wrap md:px-10 px-4">
           {/* Brand */}
-          <a
-            className="text-white text-sm uppercase hidden lg:inline-block font-semibold"
-            href="#pablo"
-            onClick={e => e.preventDefault()}
-          >
-            Dashboard
-          </a>
+          <PageTitle> Ola Mundo </PageTitle>
           {/* Form */}
           <form className="md:flex hidden flex-row flex-wrap items-center lg:ml-auto mr-3">
             <div className="relative flex w-full flex-wrap items-stretch">

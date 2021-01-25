@@ -2,15 +2,14 @@ import Order from '../../model/sales/order'
 import Invoice from '../../model/sales/invoice'
 import OrderItem from '../../model/sales/orderItem'
 import OrderItemVariant from '../../model/sales/orderItemVariant'
+import getConfig from 'next/config'
+
+// Only holds serverRuntimeConfig and publicRuntimeConfig
+const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
 
 const create_Order = (order: Order) => {
   try {
-    const url =
-      process.env.NODE_ENV === 'development'
-        ? process.env.SERVER_URI
-        : `https://${process.env.VERCEL_URL}`
-
-    const res = fetch(url + '/api/orders', {
+    const res = fetch(publicRuntimeConfig.SERVER_URI + '/api/orders', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
