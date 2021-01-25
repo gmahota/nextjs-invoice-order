@@ -55,6 +55,8 @@ import AddCircle from '@material-ui/icons/AddCircle'
 import { OrderPedding } from './../../../components/Order/OrderPedding'
 import { OrderApproval } from './../../../components/Order/OrderApproval'
 import { InvoiceList } from './../../../components/Invoice/InvoiceList'
+import orderService from '../../../service/sales/orderService'
+import { NumberFormatCustom } from './../../../components/NumberFormat/NumberFormatCustom'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -128,33 +130,6 @@ interface ProjectOptions {
   inputValue?: string
   code: string
   description: string
-}
-interface NumberFormatCustomProps {
-  inputRef: (instance: NumberFormat | null) => void
-  onChange: (event: { target: { name: string; value: string } }) => void
-  name: string
-}
-
-function NumberFormatCustom(props: NumberFormatCustomProps) {
-  const { inputRef, onChange, ...other } = props
-
-  return (
-    <NumberFormat
-      {...other}
-      getInputRef={inputRef}
-      onValueChange={values => {
-        onChange({
-          target: {
-            name: props.name,
-            value: values.value
-          }
-        })
-      }}
-      thousandSeparator
-      isNumericString
-      // prefix="$"
-    />
-  )
 }
 
 export default function OrderDetails({ order }) {
@@ -290,271 +265,278 @@ export default function OrderDetails({ order }) {
 
   return (
     <>
-      <Paper square className={classes.root}>
-        <TabContext value={value}>
-          <AppBar position="static">
-            <TabList
-              onChange={(event: any, newValue: string | null) => {
-                setValue(newValue)
-              }}
-              aria-label="simple tabs example"
-            >
-              <Tab label="Qoute" value="1" />
-              <Tab label="Qoute Resume" value="2" />
-              <Tab label="Pending Qoute" value="3" />
-              <Tab label="Approval" value="4" />
-              <Tab label="GR" value="5" />
-              <Tab label="Invoices" value="6" />
-              <Tab label="Other's" value="7" />
-            </TabList>
-          </AppBar>
-          <TabPanel value="1">
-            <Box>
-              <Card>
-                <CardHeader
-                  avatar={
-                    <Avatar aria-label="recipe" className={classes.avatar}>
-                      O
-                    </Avatar>
-                  }
-                  action={
-                    <IconButton
-                      aria-label="add"
-                      onClick={handleClickOpen}
+      <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded">
+        <Paper square className={classes.root}>
+          <TabContext value={value}>
+            <AppBar position="static">
+              <TabList
+                onChange={(event: any, newValue: string | null) => {
+                  setValue(newValue)
+                }}
+                aria-label="simple tabs example"
+              >
+                <Tab label="Qoute" value="1" />
+                <Tab label="Qoute Resume" value="2" />
+                <Tab label="Pending Qoute" value="3" />
+                <Tab label="Approval" value="4" />
+                <Tab label="GR" value="5" />
+                <Tab label="Invoices" value="6" />
+                <Tab label="Other's" value="7" />
+              </TabList>
+            </AppBar>
+            <TabPanel value="1">
+              <Box>
+                <Card>
+                  <CardHeader
+                    avatar={
+                      <Avatar aria-label="recipe" className={classes.avatar}>
+                        O
+                      </Avatar>
+                    }
+                    action={
+                      <IconButton
+                        aria-label="add"
+                        onClick={handleClickOpen}
+                        disabled={isSubmitting}
+                      >
+                        <AddCircle />
+                      </IconButton>
+                    }
+                    title={title}
+                    subheader={date}
+                  />
+                  <CardContent>
+                    <form className={classes.root}>
+                      <Grid container>
+                        <Grid item xs={8}>
+                          <div>
+                            <Autocomplete
+                              id="customer_code"
+                              options={customerList}
+                              getOptionLabel={option => {
+                                // Value selected with enter, right from the input
+                                if (typeof option === 'string') {
+                                  return option
+                                }
+                                // Add "xxx" option created dynamically
+                                if (option.inputValue) {
+                                  return option.inputValue
+                                }
+                                // Regular option
+                                return option.name
+                              }}
+                              disabled={isSubmitting}
+                              value={customer}
+                              style={{ width: 300 }}
+                              renderOption={option => option.code}
+                              renderInput={params => (
+                                <TextField
+                                  {...params}
+                                  label="Customer"
+                                  type="text"
+                                />
+                              )}
+                              onChange={(
+                                event: any,
+                                newValue: CustomerOptions | null
+                              ) => {
+                                if (newValue!) {
+                                  setCustomer(newValue.code)
+                                  setName(newValue.name)
+                                  setVat(newValue.vat)
+                                  setAddress(newValue.address)
+                                  setDocument('')
+                                } else {
+                                  setCustomer('')
+                                  setName('')
+                                  setVat('')
+                                  setAddress('')
+                                  setDocument('')
+                                }
+                              }}
+                            />
+
+                            <TextField
+                              label="Name"
+                              type="text"
+                              value={name}
+                              autoFocus
+                              margin="dense"
+                              id="name"
+                              multiline
+                              rowsMax={4}
+                              onChange={event => setName(event.target.value)}
+                              disabled={isSubmitting}
+                            />
+
+                            <TextField
+                              label="Nr. VAT"
+                              type="text"
+                              value={vat}
+                              autoFocus
+                              margin="dense"
+                              id="vat"
+                              multiline
+                              rowsMax={4}
+                              onChange={event => setVat(event.target.value)}
+                              disabled={isSubmitting}
+                            />
+                          </div>
+                          <div>
+                            <TextField
+                              label="Address"
+                              type="text"
+                              value={address}
+                              autoFocus
+                              margin="dense"
+                              id="address"
+                              multiline
+                              rowsMax={4}
+                              onChange={event => setAddress(event.target.value)}
+                              disabled={isSubmitting}
+                            />
+
+                            <TextField
+                              label="Document"
+                              type="text"
+                              value={document}
+                              autoFocus
+                              margin="dense"
+                              id="document"
+                              multiline
+                              rowsMax={4}
+                              onChange={event =>
+                                setDocument(event.target.value)
+                              }
+                              disabled={isSubmitting}
+                            />
+                          </div>
+                        </Grid>
+                        <Grid item xs={4} className={classes.totalArea}>
+                          <TextField
+                            autoFocus
+                            margin="dense"
+                            id="grossTotal"
+                            label="Gross Total"
+                            value={grossTotal}
+                            disabled
+                            fullWidth
+                          />
+
+                          <TextField
+                            autoFocus
+                            margin="dense"
+                            id="vatTotal"
+                            label="Vat Total"
+                            value={vatTotal}
+                            disabled
+                            fullWidth
+                          />
+
+                          <TextField
+                            autoFocus
+                            margin="dense"
+                            id="Total"
+                            label="Total"
+                            value={total}
+                            disabled
+                            fullWidth
+                          />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                          <TableContainer component={Paper}>
+                            <Table
+                              className={classes.table}
+                              aria-label="simple table"
+                            >
+                              <TableHead>
+                                <TableRow>
+                                  <TableCell>#</TableCell>
+                                  <TableCell align="left">Item</TableCell>
+                                  <TableCell align="left">
+                                    Description
+                                  </TableCell>
+                                  <TableCell align="left">Project</TableCell>
+                                  <TableCell align="left">UN</TableCell>
+                                  <TableCell align="right">Quantity</TableCell>
+                                  <TableCell align="right">Price</TableCell>
+                                  <TableCell align="right">Total</TableCell>
+                                </TableRow>
+                              </TableHead>
+                              <TableBody>
+                                {order.items?.map(row => (
+                                  <TableRow key={row.id}>
+                                    <TableCell component="th" scope="row">
+                                      {row.id}
+                                    </TableCell>
+                                    <TableCell align="left">
+                                      {row.code}
+                                    </TableCell>
+                                    <TableCell align="left">
+                                      {row.description}
+                                    </TableCell>
+                                    <TableCell align="left">
+                                      {row.project}
+                                    </TableCell>
+                                    <TableCell align="left">
+                                      {row.unity}
+                                    </TableCell>
+                                    <TableCell align="right">
+                                      {row.quantity}
+                                    </TableCell>
+                                    <TableCell align="right">
+                                      {row.price}
+                                    </TableCell>
+                                    <TableCell align="right">
+                                      {row.total}
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </TableContainer>
+                        </Grid>
+                      </Grid>
+                    </form>
+                  </CardContent>
+
+                  <CardActions disableSpacing>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={handleBack}
+                    >
+                      Voltar
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={handleSave}
                       disabled={isSubmitting}
                     >
-                      <AddCircle />
-                    </IconButton>
-                  }
-                  title={title}
-                  subheader={date}
-                />
-                <CardContent>
-                  <form className={classes.root}>
-                    <Grid container>
-                      <Grid item xs={8}>
-                        <div>
-                          <Autocomplete
-                            id="customer_code"
-                            options={customerList}
-                            getOptionLabel={option => {
-                              // Value selected with enter, right from the input
-                              if (typeof option === 'string') {
-                                return option
-                              }
-                              // Add "xxx" option created dynamically
-                              if (option.inputValue) {
-                                return option.inputValue
-                              }
-                              // Regular option
-                              return option.name
-                            }}
-                            disabled={isSubmitting}
-                            value={customer}
-                            style={{ width: 300 }}
-                            renderOption={option => option.code}
-                            renderInput={params => (
-                              <TextField
-                                {...params}
-                                label="Customer"
-                                type="text"
-                              />
-                            )}
-                            onChange={(
-                              event: any,
-                              newValue: CustomerOptions | null
-                            ) => {
-                              if (newValue!) {
-                                setCustomer(newValue.code)
-                                setName(newValue.name)
-                                setVat(newValue.vat)
-                                setAddress(newValue.address)
-                                setDocument('')
-                              } else {
-                                setCustomer('')
-                                setName('')
-                                setVat('')
-                                setAddress('')
-                                setDocument('')
-                              }
-                            }}
-                          />
+                      Save
+                    </Button>
+                  </CardActions>
+                </Card>
+              </Box>
+            </TabPanel>
+            <TabPanel value="2">Item Three</TabPanel>
+            <TabPanel value="3">
+              <OrderPedding order={order} id={id.toString()} />
+            </TabPanel>
 
-                          <TextField
-                            label="Name"
-                            type="text"
-                            value={name}
-                            autoFocus
-                            margin="dense"
-                            id="name"
-                            multiline
-                            rowsMax={4}
-                            onChange={event => setName(event.target.value)}
-                            disabled={isSubmitting}
-                          />
-
-                          <TextField
-                            label="Nr. VAT"
-                            type="text"
-                            value={vat}
-                            autoFocus
-                            margin="dense"
-                            id="vat"
-                            multiline
-                            rowsMax={4}
-                            onChange={event => setVat(event.target.value)}
-                            disabled={isSubmitting}
-                          />
-                        </div>
-                        <div>
-                          <TextField
-                            label="Address"
-                            type="text"
-                            value={address}
-                            autoFocus
-                            margin="dense"
-                            id="address"
-                            multiline
-                            rowsMax={4}
-                            onChange={event => setAddress(event.target.value)}
-                            disabled={isSubmitting}
-                          />
-
-                          <TextField
-                            label="Document"
-                            type="text"
-                            value={document}
-                            autoFocus
-                            margin="dense"
-                            id="document"
-                            multiline
-                            rowsMax={4}
-                            onChange={event => setDocument(event.target.value)}
-                            disabled={isSubmitting}
-                          />
-                        </div>
-                      </Grid>
-                      <Grid item xs={4} className={classes.totalArea}>
-                        <TextField
-                          autoFocus
-                          margin="dense"
-                          id="grossTotal"
-                          label="Gross Total"
-                          value={grossTotal}
-                          disabled
-                          fullWidth
-                        />
-
-                        <TextField
-                          autoFocus
-                          margin="dense"
-                          id="vatTotal"
-                          label="Vat Total"
-                          value={vatTotal}
-                          disabled
-                          fullWidth
-                        />
-
-                        <TextField
-                          autoFocus
-                          margin="dense"
-                          id="Total"
-                          label="Total"
-                          value={total}
-                          disabled
-                          fullWidth
-                        />
-                      </Grid>
-
-                      <Grid item xs={12}>
-                        <TableContainer component={Paper}>
-                          <Table
-                            className={classes.table}
-                            aria-label="simple table"
-                          >
-                            <TableHead>
-                              <TableRow>
-                                <TableCell>#</TableCell>
-                                <TableCell align="left">Item</TableCell>
-                                <TableCell align="left">Description</TableCell>
-                                <TableCell align="left">Project</TableCell>
-                                <TableCell align="left">UN</TableCell>
-                                <TableCell align="right">Quantity</TableCell>
-                                <TableCell align="right">Price</TableCell>
-                                <TableCell align="right">Total</TableCell>
-                              </TableRow>
-                            </TableHead>
-                            <TableBody>
-                              {order.items?.map(row => (
-                                <TableRow key={row.id}>
-                                  <TableCell component="th" scope="row">
-                                    {row.id}
-                                  </TableCell>
-                                  <TableCell align="left">{row.code}</TableCell>
-                                  <TableCell align="left">
-                                    {row.description}
-                                  </TableCell>
-                                  <TableCell align="left">
-                                    {row.project}
-                                  </TableCell>
-                                  <TableCell align="left">
-                                    {row.unity}
-                                  </TableCell>
-                                  <TableCell align="right">
-                                    {row.quantity}
-                                  </TableCell>
-                                  <TableCell align="right">
-                                    {row.price}
-                                  </TableCell>
-                                  <TableCell align="right">
-                                    {row.total}
-                                  </TableCell>
-                                </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
-                        </TableContainer>
-                      </Grid>
-                    </Grid>
-                  </form>
-                </CardContent>
-
-                <CardActions disableSpacing>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={handleBack}
-                  >
-                    Voltar
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={handleSave}
-                    disabled={isSubmitting}
-                  >
-                    Save
-                  </Button>
-                </CardActions>
-              </Card>
-            </Box>
-          </TabPanel>
-          <TabPanel value="2">Item Three</TabPanel>
-          <TabPanel value="3">
-            <OrderPedding order={order} id={id.toString()} />
-          </TabPanel>
-
-          <TabPanel value="4">
-            <OrderApproval order={order} id={id.toString()} />
-          </TabPanel>
-          <TabPanel value="5"></TabPanel>
-          <TabPanel value="6">
-            <InvoiceList order={order} id={id.toString()} />
-          </TabPanel>
-          <TabPanel value="7"></TabPanel>
-        </TabContext>
-      </Paper>
-
+            <TabPanel value="4">
+              <OrderApproval order={order} id={id.toString()} />
+            </TabPanel>
+            <TabPanel value="5"></TabPanel>
+            <TabPanel value="6">
+              <InvoiceList order={order} id={id.toString()} />
+            </TabPanel>
+            <TabPanel value="7"></TabPanel>
+          </TabContext>
+        </Paper>
+      </div>
       <Dialog
         open={open}
         onClose={handleClose}
@@ -738,35 +720,8 @@ export const getStaticProps: GetStaticProps = async context => {
   try {
     const { id } = context.params
 
-    const url =
-      process.env.NODE_ENV === 'development'
-        ? process.env.SERVER_URI
-        : `https://${process.env.VERCEL_URL}`
-
-    const response = await fetch(url + `/api/order/${id}`)
-    const {
-      code,
-      customer,
-      name,
-      vat,
-      status,
-      total,
-      OrderItems
-    } = await response.json()
-
-    const items = OrderItems || []
-
-    const order: Order = {
-      id: Number.parseInt(id.toString()),
-      code,
-      customer,
-      name,
-      vat,
-      status,
-      total,
-      items: [...items]
-    }
-
+    const order: Order = await orderService.get_Order(id)
+    console.log(order)
     return {
       props: {
         order: order

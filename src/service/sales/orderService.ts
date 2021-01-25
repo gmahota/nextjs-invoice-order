@@ -7,9 +7,9 @@ import getConfig from 'next/config'
 // Only holds serverRuntimeConfig and publicRuntimeConfig
 const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
 
-const create_Order = (order: Order) => {
+const create_Order = async (order: Order) => {
   try {
-    const res = fetch(publicRuntimeConfig.SERVER_URI + '/api/orders', {
+    const res = await fetch(publicRuntimeConfig.SERVER_URI + 'sales/orders', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -18,6 +18,42 @@ const create_Order = (order: Order) => {
     })
 
     return res
+  } catch (e: any) {
+    console.error(e)
+  }
+}
+
+const get_Orders = async (): Promise<Order[]> => {
+  try {
+    let orders = []
+    await fetch(publicRuntimeConfig.SERVER_URI + 'sales/orders', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(response => response.json())
+      .then((data: Order[]) => (orders = data))
+
+    return orders
+  } catch (e: any) {
+    console.error(e)
+  }
+}
+
+const get_Order = async (id: string): Promise<Order> => {
+  try {
+    let order = {}
+    order = await fetch(publicRuntimeConfig.SERVER_URI + `sales/orders/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(response => response.json())
+      .then((data: Order) => (order = data))
+
+    return order
   } catch (e: any) {
     console.error(e)
   }
@@ -123,8 +159,10 @@ const get_RowTotalInvoice = (order: Order, rowNumber: number): number => {
   return total
 }
 
-export {
+export default {
   create_Order,
+  get_Orders,
+  get_Order,
   get_Invoices,
   get_TotalInvoices,
   get_PeddingItems,
@@ -133,5 +171,6 @@ export {
   get_TotalApprovalItems,
   get_RowTotalPedding,
   get_RowTotalApproval,
-  get_RowTotalInvoice
+  get_RowTotalInvoice,
+  set_OrderInvoiceStatus
 }

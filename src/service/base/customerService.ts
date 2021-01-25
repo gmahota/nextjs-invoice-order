@@ -1,13 +1,13 @@
 import { Customer } from '../../model/base/customer'
+import getConfig from 'next/config'
+
+const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
 
 const get_CustomerById = async (id: number): Promise<Customer> => {
   try {
-    const url =
-      process.env.NODE_ENV === 'development'
-        ? process.env.SERVER_URI
-        : `https://${process.env.VERCEL_URL}`
-
-    const response = await fetch(url + `/api/customers/${id}`)
+    const response = await fetch(
+      publicRuntimeConfig.SERVER_URI + `base/customers/${id}`
+    )
 
     const { code, name, vatNumber, address } = await response.json()
     const data: Customer = {
@@ -25,12 +25,9 @@ const get_CustomerById = async (id: number): Promise<Customer> => {
 
 const get_Customers: Customer[] = async (): Customer[] => {
   try {
-    const url =
-      process.env.NODE_ENV === 'development'
-        ? process.env.SERVER_URI
-        : `https://${process.env.VERCEL_URL}`
-
-    const response = await fetch(url + '/api/customers')
+    const response = await fetch(
+      publicRuntimeConfig.SERVER_URI + 'base/customers'
+    )
 
     const list = await response.json()
     return list

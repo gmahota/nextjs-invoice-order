@@ -30,6 +30,7 @@ import DetailsOutlined from '@material-ui/icons/DetailsOutlined'
 import AddCircle from '@material-ui/icons/AddCircle'
 import Search from '@material-ui/icons/Search'
 import IconButton from '@material-ui/core/IconButton'
+import orderService from '../../service/sales/orderService'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -106,16 +107,12 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-const fetcher = url => fetch(url).then(r => r.json())
-
-export default function OrderList() {
+export default function OrderList({ allOrders }) {
   const router = useRouter()
 
   if (router.isFallback) {
     return <p>Carregando...</p>
   }
-
-  const { data, error } = useSWR('/api/order/', fetcher)
 
   const classes = useStyles()
 
@@ -127,95 +124,90 @@ export default function OrderList() {
 
   return (
     <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded">
-      <Card>
-        <AppBar position="static">
-          <Toolbar>
-            <Typography className={classes.title} variant="h6" noWrap>
-              Order List
-            </Typography>
-            <div className={classes.search}>
-              <div className={classes.searchIcon}>
-                <Search />
-              </div>
-              <InputBase
-                placeholder="Search…"
-                classes={{
-                  root: classes.inputRoot,
-                  input: classes.inputInput
-                }}
-                inputProps={{ 'aria-label': 'search' }}
-                value={filterStr}
-                onChange={event =>
-                  setFilterStr(event.target.value.toLowerCase())
-                }
-              />
-            </div>
-            <div className={classes.grow} />
+      <div className="flex flex-wrap items-center">
+        <div className="relative w-full px-4 max-w-full flex-grow flex-1">
+          <h3 className="font-semibold text-base text-gray-800">
+            Pedding Order's
+          </h3>
+          <div className={classes.searchIcon}>
+            <Search />
+          </div>
+          <div className={classes.search}>
+            <InputBase
+              placeholder="Search…"
+              classes={{
+                root: classes.inputRoot,
+                input: classes.inputInput
+              }}
+              inputProps={{ 'aria-label': 'search' }}
+              value={filterStr}
+              onChange={event => setFilterStr(event.target.value.toLowerCase())}
+            />
+          </div>
+        </div>
+        <div className="relative w-full px-4 max-w-full flex-grow flex-1 text-right">
+          <IconButton
+            aria-label="Create New Order"
+            onClick={handleNewOrder}
+            color="inherit"
+          >
+            <AddCircle />
+          </IconButton>
+        </div>
+      </div>
 
-            <div className={classes.sectionDesktop}>
-              <IconButton
-                aria-label="Create New Order"
-                onClick={handleNewOrder}
-                color="inherit"
-              >
-                <AddCircle />
-              </IconButton>
-            </div>
-            <div className={classes.sectionMobile}>
-              <IconButton
-                aria-label="Create New Order"
-                onClick={handleNewOrder}
-                color="inherit"
-              >
-                <AddCircle />
-              </IconButton>
-            </div>
-          </Toolbar>
-        </AppBar>
-        <CardHeader></CardHeader>
-        <Grid container>
-          <Grid item xs={12}>
-            <TableContainer component={Paper}>
-              <Table className={classes.table} aria-label="simple table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell align="left">#</TableCell>
-                    <TableCell align="left">Order</TableCell>
-                    <TableCell align="left">Customer</TableCell>
-                    <TableCell align="left">Name</TableCell>
-                    <TableCell align="left">Total</TableCell>
-                    <TableCell align="right">Status</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {data
-                    ?.filter(
-                      e =>
-                        filterStr.length === 0 ||
-                        e.code?.toLowerCase().includes(filterStr) ||
-                        e.customer?.toLowerCase().includes(filterStr) ||
-                        e.name?.toLowerCase().includes(filterStr)
-                    )
-                    .map(row => (
-                      <TableRow key={row.ref['@ref'].id}>
-                        <TableCell align="left">
-                          <Link href={`/order/${row.ref['@ref'].id}`}>
-                            <DetailsOutlined />
-                          </Link>
-                        </TableCell>
-                        <TableCell align="left">{row.data.code}</TableCell>
-                        <TableCell align="left">{row.data.customer}</TableCell>
-                        <TableCell align="left">{row.data.name}</TableCell>
-                        <TableCell align="left">{row.data.total}</TableCell>
-                        <TableCell align="right">{row.data.status}</TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Grid>
+      <div className="rounded-t mb-0 px-4 py-3 bg-transparent">
+        <Grid item xs={12}>
+          <TableContainer component={Paper}>
+            <Table className={classes.table} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell align="left">#</TableCell>
+                  <TableCell align="left">Order</TableCell>
+                  <TableCell align="left">Customer</TableCell>
+                  <TableCell align="left">Name</TableCell>
+                  <TableCell align="left">Total</TableCell>
+                  <TableCell align="right">Status</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {allOrders
+                  ?.filter(
+                    e =>
+                      filterStr.length === 0 ||
+                      e.code?.toLowerCase().includes(filterStr) ||
+                      e.customer?.toLowerCase().includes(filterStr) ||
+                      e.name?.toLowerCase().includes(filterStr)
+                  )
+                  .map(row => (
+                    <TableRow key={row.id}>
+                      <TableCell align="left">
+                        <Link href={`/order/${row.id}`}>
+                          <DetailsOutlined />
+                        </Link>
+                      </TableCell>
+                      <TableCell align="left">{row.code}</TableCell>
+                      <TableCell align="left">{row.customer}</TableCell>
+                      <TableCell align="left">{row.name}</TableCell>
+                      <TableCell align="left">{row.total}</TableCell>
+                      <TableCell align="right">{row.status}</TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Grid>
-      </Card>
+      </div>
     </div>
   )
+}
+
+export const getStaticProps = async () => {
+  const allOrders = await orderService.get_Orders()
+
+  return {
+    props: {
+      allOrders
+    }
+  }
 }
