@@ -1,13 +1,13 @@
 import { Product } from '../../model/base/product'
+import getConfig from 'next/config'
+// Only holds serverRuntimeConfig and publicRuntimeConfig
+const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
 
 const get_ProductById = async (id: number): Promise<Product> => {
   try {
-    const url =
-      process.env.NODE_ENV === 'development'
-        ? process.env.SERVER_URI
-        : `https://${process.env.VERCEL_URL}`
-
-    const response = await fetch(url + `/api/Products/${id}`)
+    const response = await fetch(
+      `${publicRuntimeConfig.SERVER_URI}base/Products/${id}`
+    )
 
     const { code, description, price } = await response.json()
     const data: Product = {
@@ -24,12 +24,9 @@ const get_ProductById = async (id: number): Promise<Product> => {
 
 const get_Products: Product[] = async (): Product[] => {
   try {
-    const url =
-      process.env.NODE_ENV === 'development'
-        ? process.env.SERVER_URI
-        : `https://${process.env.VERCEL_URL}`
-
-    const response = await fetch(url + '/api/Products')
+    const response = await fetch(
+      `${publicRuntimeConfig.SERVER_URI}base/Products`
+    )
 
     const list = await response.json()
 

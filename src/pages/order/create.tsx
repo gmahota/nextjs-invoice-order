@@ -8,7 +8,7 @@ import { CustomerOptions } from '../../model/base/customer'
 import { get_Customers } from '../../service/base/customerService'
 import { get_Products } from '../../service/base/productService'
 import { get_Projects } from '../../service/base/projectService'
-import { create_Order } from '../../service/sales/orderService'
+import orderService from '../../service/sales/orderService'
 
 import Moment from 'react-moment'
 import moment from 'moment'
@@ -189,19 +189,24 @@ export default function CreateOrder({
   const handleSave = async () => {
     // setOpen(true)
 
-    const order: Order = {
-      id: 0,
-      code: document,
-      customer: customer,
-      name: name,
-      vat: vat,
-      status: 'open',
-      total: total,
-      items: items
+    try {
+      const order: Order = {
+        id: 0,
+        code: document,
+        customer: customer,
+        name: name,
+        vat: vat,
+        status: 'open',
+        total: total,
+        items: items
+      }
+      orderService.create_Order(order)
+
+      Router.push('/order')
+    } catch (e) {
+      console.log(e)
+      alert('Error on create documento' + e)
     }
-
-    create_Order(order)
-
     // if (res?.status === 200) {
     //   Router.push('/order')
     // } else {
@@ -263,6 +268,12 @@ export default function CreateOrder({
     setOpen(false)
   }
 
+  const handlerRemoveLine = async (id: number) => {
+    const newItems = items.filter(item => item.id !== id)
+
+    setItems(newItems)
+  }
+
   return (
     <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded">
       <Card>
@@ -302,10 +313,10 @@ export default function CreateOrder({
                       newValue: CustomerOptions | null
                     ) => {
                       if (newValue!) {
-                        setCustomer(newValue.id)
-                        setName(newValue.name)
-                        setVat(newValue.vat)
-                        setAddress(newValue.address)
+                        setCustomer(newValue.code)
+                        setName(newValue.name || '')
+                        setVat(newValue.vat || '')
+                        setAddress(newValue.address || '')
                         setDocument('')
                       } else {
                         setCustomer('')
@@ -400,6 +411,15 @@ export default function CreateOrder({
                           <TableCell align="right">{row.quantity}</TableCell>
                           <TableCell align="right">{row.price}</TableCell>
                           <TableCell align="right">{row.total}</TableCell>
+                          <TableCell align="right">
+                            <button
+                              className="cursor-pointer text-black opacity-50 md:hidden px-3 py-1 text-xl leading-none bg-transparent rounded border border-solid border-transparent"
+                              type="button"
+                              onClick={() => handlerRemoveLine(row.id)}
+                            >
+                              <i className="fas fa-minus-circle"></i>
+                            </button>
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -483,7 +503,7 @@ export default function CreateOrder({
               )}
               onChange={(event: any, newValue: ProductOptions | null) => {
                 if (newValue!) {
-                  setItemCode(newValue.code)
+                  setItemCode(newValue.id)
                   setItemDescription(newValue.description)
                   setItemPrice(newValue.price)
                 } else {
@@ -529,7 +549,7 @@ export default function CreateOrder({
               )}
               onChange={(event: any, newValue: ProjectOptions | null) => {
                 if (newValue!) {
-                  setItemProject(newValue.code)
+                  setItemProject(newValue.id)
                 } else {
                   setItemProject('')
                 }

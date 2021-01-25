@@ -28,13 +28,7 @@ import ThumbDownAltIcon from '@material-ui/icons/ThumbDownAlt'
 import Order from './../../model/sales/order'
 import OrderItem from './../../model/sales/orderItem'
 import OrderItemVariant from './../../model/sales/orderItemVariant'
-import {
-  get_TotalApprovalItems,
-  get_ApprovalItems,
-  get_RowTotalPedding,
-  get_RowTotalApproval,
-  get_RowTotalInvoice
-} from '../../service/sales/orderService'
+import orderService from '../../service/sales/orderService'
 
 import { red } from '@material-ui/core/colors'
 
@@ -120,10 +114,10 @@ export const OrderApproval = function OrderApproval(props: OrderApprovalProps) {
 
   // Aproval
   const [approvalTotalAmount, setApprovalTotalAmount] = useState(
-    get_TotalApprovalItems(order)
+    orderService.get_TotalApprovalItems(order)
   )
 
-  const approvalItens: OrderItem[] = get_ApprovalItems(order)
+  const approvalItens: OrderItem[] = orderService.get_ApprovalItems(order)
   // Approval Functions
   const handleClickApproveAll = () => {}
 

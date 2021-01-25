@@ -27,10 +27,7 @@ import SaveIcon from '@material-ui/icons/Save'
 import Order from './../../model/sales/order'
 import OrderItem from './../../model/sales/orderItem'
 import OrderItemVariant from './../../model/sales/orderItemVariant'
-import {
-  get_PeddingItems,
-  set_OrderPeddingStatus
-} from '../../service/sales/orderService'
+import orderService from '../../service/sales/orderService'
 
 import { red } from '@material-ui/core/colors'
 import { RowPedding } from './../OrderRow/RowPedding'
@@ -116,7 +113,7 @@ export const OrderPedding = function OrderPedding(props: OrderPeddingProps) {
   const [totalAmount, setTotalAmount] = useState(0)
   const [openDialog, setOpenDialog] = useState(false)
 
-  const peddingItens: OrderItem[] = get_PeddingItems(order)
+  const peddingItens: OrderItem[] = orderService.get_PeddingItems(order)
 
   const handleCloseAddItem = () => {
     setOpenDialog(false)
@@ -150,7 +147,7 @@ export const OrderPedding = function OrderPedding(props: OrderPeddingProps) {
   }
 
   const handlePeddingSave = async () => {
-    set_OrderPeddingStatus(order)
+    orderService.set_OrderPeddingStatus(order)
 
     console.log(order)
 

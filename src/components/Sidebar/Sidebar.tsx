@@ -88,16 +88,6 @@ export default function Sidebar() {
                   className="text-gray-800 hover:text-gray-600 text-xs uppercase py-3 font-bold block"
                   href="/"
                 >
-                  <i className="fas fa-newspaper text-gray-500 mr-2 text-sm"></i>{' '}
-                  Landing Page
-                </a>
-              </li>
-
-              <li className="items-center">
-                <a
-                  className="text-gray-800 hover:text-gray-600 text-xs uppercase py-3 font-bold block"
-                  href="/"
-                >
                   <i className="fas fa-user-circle text-gray-500 mr-2 text-sm"></i>{' '}
                   Profile Page
                 </a>
@@ -139,67 +129,56 @@ export default function Sidebar() {
             <hr className="my-4 md:min-w-full" />
             {/* Heading */}
             <h6 className="md:min-w-full text-gray-600 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
-              Documentation
+              Order
             </h6>
             {/* Navigation */}
             <ul className="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
               <li className="inline-flex">
                 <a
                   className="text-gray-800 hover:text-gray-600 text-sm block mb-4 no-underline font-semibold"
-                  href="/"
+                  href="/order/create"
                 >
-                  <i className="fas fa-paint-brush mr-2 text-gray-500 text-base"></i>{' '}
-                  Styles
+                  <i className="fas fa-plus-circle mr-2 text-gray-500 text-base"></i>{' '}
+                  New
+                </a>
+              </li>
+              <li className="inline-flex">
+                <a
+                  className="text-gray-800 hover:text-gray-600 text-sm block mb-4 no-underline font-semibold"
+                  href="/order"
+                >
+                  <i className="fas fa-clipboard-list mr-2 text-gray-500 text-base"></i>{' '}
+                  List
                 </a>
               </li>
 
               <li className="inline-flex">
                 <a
                   className="text-gray-800 hover:text-gray-600 text-sm block mb-4 no-underline font-semibold"
-                  href="/"
+                  href="/Order/Aproval"
                 >
-                  <i className="fab fa-css3-alt mr-2 text-gray-500 text-base"></i>{' '}
-                  CSS Components
-                </a>
-              </li>
-
-              <li className="inline-flex">
-                <a
-                  className="text-gray-800 hover:text-gray-600 text-sm block mb-4 no-underline font-semibold"
-                  href="/"
-                >
-                  <i className="fab fa-vuejs mr-2 text-gray-500 text-base"></i>{' '}
-                  VueJS
+                  <i className="fas fa-thumbs-up mr-2 text-gray-500 text-base"></i>{' '}
+                  Approval
                 </a>
               </li>
 
               <li className="inline-flex">
                 <a
                   className="text-gray-800 hover:text-gray-600  text-sm block mb-4 no-underline font-semibold"
-                  href="/"
+                  href="/PO"
                 >
-                  <i className="fab fa-react mr-2 text-gray-500 text-base"></i>{' '}
-                  React
+                  <i className="fas fa-external-link-alt mr-2 text-gray-500 text-base"></i>{' '}
+                  PO'S
                 </a>
               </li>
 
               <li className="inline-flex">
                 <a
                   className="text-gray-800 hover:text-gray-600  text-sm block mb-4 no-underline font-semibold"
-                  href="/"
+                  href="/order"
                 >
-                  <i className="fab fa-angular mr-2 text-gray-500 text-base"></i>{' '}
-                  Angular
-                </a>
-              </li>
-
-              <li className="inline-flex">
-                <a
-                  className="text-gray-800 hover:text-gray-600  text-sm block mb-4 no-underline font-semibold"
-                  href="/"
-                >
-                  <i className="fab fa-js-square mr-2 text-gray-500 text-base"></i>{' '}
-                  Javascript
+                  <i className="fas fa-file-invoice-dollar mr-2 text-gray-500 text-base"></i>{' '}
+                  Invoice's
                 </a>
               </li>
             </ul>

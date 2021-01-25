@@ -16,12 +16,7 @@ import TableHead from '@material-ui/core/TableHead'
 import Order from '../../model/sales/order'
 import OrderItem from '../../model/sales/orderItem'
 import OrderItemVariant from './../../model/sales/orderItemVariant'
-import {
-  get_ApprovalItems,
-  get_RowTotalPedding,
-  get_RowTotalApproval,
-  get_RowTotalInvoice
-} from '../../service/sales/orderService'
+import orderService from '../../service/sales/orderService'
 
 // Icons
 import ThumbUpIcon from '@material-ui/icons/ThumbUp'
@@ -70,9 +65,18 @@ export const RowApproval = function RowApproval(props: OrderItemProps) {
 
   const itemVariants: OrderItemVariant[] = order.items[row.id - 1].itemVarients
 
-  const totalPedding: number = get_RowTotalPedding(order, row.id - 1)
-  const totalApproval: number = get_RowTotalApproval(order, row.id - 1)
-  const totalInvoice: number = get_RowTotalInvoice(order, row.id - 1)
+  const totalPedding: number = orderService.get_RowTotalPedding(
+    order,
+    row.id - 1
+  )
+  const totalApproval: number = orderService.get_RowTotalApproval(
+    order,
+    row.id - 1
+  )
+  const totalInvoice: number = orderService.get_RowTotalInvoice(
+    order,
+    row.id - 1
+  )
 
   return (
     <React.Fragment>

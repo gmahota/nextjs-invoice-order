@@ -29,10 +29,7 @@ import Order from './../../model/sales/order'
 import Invoice from './../../model/sales/invoice'
 import InvoiceItem from './../../model/sales/invoiceItem'
 import OrderItemVariant from './../../model/sales/orderItemVariant'
-import {
-  get_Invoices,
-  get_TotalInvoices
-} from '../../service/sales/orderService'
+import orderService from '../../service/sales/orderService'
 
 import { red } from '@material-ui/core/colors'
 
@@ -114,7 +111,7 @@ export const InvoiceList = function InvoiceList(props: OrderApprovalProps) {
   const classes = useStyles()
 
   // Aproval
-  const [total, setTotal] = useState(get_TotalInvoices(order))
+  const [total, setTotal] = useState(orderService.get_TotalInvoices(order))
 
   // Approval Functions
   const handleClickApproveAll = () => {}
