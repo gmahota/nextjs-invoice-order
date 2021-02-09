@@ -43,69 +43,6 @@ import { CustomerOptions } from '../../model/base/customer'
 import DialogActions from '@material-ui/core/DialogActions'
 import CustomerDocument from '../../model/sales/customerDocument'
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      '& .MuiTextField-root': {
-        margin: theme.spacing(1),
-        width: '25ch'
-      },
-      '& > *': {
-        borderBottom: 'unset'
-      }
-    },
-    bullet: {
-      display: 'inline-block',
-      margin: '0 2px',
-      transform: 'scale(0.8)'
-    },
-    title: {
-      fontSize: 14
-    },
-    pos: {
-      marginBottom: 12
-    },
-    menuButton: {
-      marginRight: 2
-    },
-    form: {},
-    formHeader: {
-      display: 'flex',
-      flex: '50%',
-      alignItems: 'center',
-      flexDirection: 'column',
-      justifyContent: 'center'
-    },
-    formContent: {
-      display: 'flex',
-      alignItems: 'center',
-      flexDirection: 'column',
-      justifyContent: 'center'
-    },
-    table: {
-      minWidth: 650
-    },
-    column: {
-      float: 'left',
-      width: '50%'
-    },
-    avatar: {
-      backgroundColor: red[500]
-    },
-    inputArea: {},
-    totalArea: {
-      borderStyle: 'dashed',
-      borderWidth: 1,
-      display: 'flex',
-      alignItems: 'center',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      border: 10,
-      borderRadius: 10
-    }
-  })
-)
-
 const fetcher = url => fetch(url).then(r => r.json())
 
 const customerList: CustomerOptions[] = [

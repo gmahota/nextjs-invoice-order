@@ -7,9 +7,9 @@ const UserDropdown = () => {
   const btnDropdownRef = React.createRef()
   const popoverDropdownRef = React.createRef()
   const openDropdownPopover = () => {
-    new Popper(btnDropdownRef.current, popoverDropdownRef.current, {
-      placement: 'bottom-end'
-    })
+    // new Popper(btnDropdownRef.current, popoverDropdownRef.current, {
+    //   placement: 'bottom-end'
+    // })
     setDropdownPopoverShow(true)
   }
   const closeDropdownPopover = () => {
@@ -20,7 +20,7 @@ const UserDropdown = () => {
       <a
         className="text-gray-600 block"
         href="#pablo"
-        ref={btnDropdownRef}
+        // ref={btnDropdownRef}
         onClick={e => {
           e.preventDefault()
           dropdownPopoverShow ? closeDropdownPopover() : openDropdownPopover()
@@ -37,7 +37,7 @@ const UserDropdown = () => {
         </div>
       </a>
       <div
-        ref={popoverDropdownRef}
+        // ref={popoverDropdownRef}
         className={
           (dropdownPopoverShow ? 'block ' : 'hidden ') +
           'bg-white text-base z-50 float-left py-2 list-none text-left rounded shadow-lg mt-1'

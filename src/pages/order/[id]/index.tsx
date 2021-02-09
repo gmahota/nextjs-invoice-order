@@ -720,7 +720,7 @@ export const getStaticProps: GetStaticProps = async context => {
   try {
     const { id } = context.params
 
-    const order: Order = await orderService.get_Order(id)
+    const order: Order = await orderService.get_Order(id[0])
     console.log(order)
     return {
       props: {
