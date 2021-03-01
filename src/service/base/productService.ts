@@ -10,8 +10,8 @@ const get_ProductById = async (id: number): Promise<Product> => {
     )
 
     const { code, description, price } = await response.json()
-    const data: Product = {
-      id,
+    const data = {
+      id: id.toString(),
       code,
       description,
       price
@@ -22,7 +22,7 @@ const get_ProductById = async (id: number): Promise<Product> => {
   }
 }
 
-const get_Products: Product[] = async (): Product[] => {
+const get_Products = async (): Promise<Product[]> => {
   try {
     const response = await fetch(
       `${publicRuntimeConfig.SERVER_URI}base/Products`

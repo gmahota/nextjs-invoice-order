@@ -13,17 +13,11 @@ import {
   Toolbar,
   Typography
 } from '@material-ui/core'
-import Product from '../../model/base/product'
+import { Product, ProductOptions } from '../../model/base/product'
+import { get_Products } from '../../service/base/productService'
 import { AddCircle, DetailsOutlined, Search } from '@material-ui/icons'
 
-// Top 100 films as rated by IMDb users. http://www.imdb.com/chart/top
-const productList: Product[] = [
-  { code: 'A001', description: 'Teste', price: 1000 },
-  { code: 'A002', description: 'Teste 2', price: 2000 },
-  { code: 'A003', description: 'Teste 2', price: 3000 }
-]
-
-export default function ProductList() {
+export default function ProductList({ allProducts }) {
   const router = useRouter()
 
   if (router.isFallback) {
@@ -76,7 +70,7 @@ export default function ProductList() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {productList
+            {allProducts
               ?.filter(
                 e =>
                   filterStr.length === 0 ||
@@ -101,4 +95,20 @@ export default function ProductList() {
       </div>
     </div>
   )
+}
+
+export const getStaticProps = async () => {
+  const products = await get_Products()
+
+  const allProducts = products.map(product => {
+    const p: ProductOptions = {
+      ...product
+    }
+    return p
+  })
+  return {
+    props: {
+      allProducts
+    }
+  }
 }

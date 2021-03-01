@@ -23,7 +23,7 @@ const get_CustomerById = async (id: number): Promise<Customer> => {
   }
 }
 
-const get_Customers: Customer[] = async (): Customer[] => {
+const get_Customers = async (): Promise<Customer[]> => {
   try {
     const response = await fetch(
       publicRuntimeConfig.SERVER_URI + 'base/customers'

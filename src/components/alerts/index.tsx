@@ -13,7 +13,7 @@ const Alert = ({
   children
 }) => {
   const [hidden, setHidden] = useState(false)
-  let css = []
+  const css = []
   css.push(color)
   if (outlined) css.push('border border-current')
   if (raised) css.push('shadow')
@@ -25,9 +25,11 @@ const Alert = ({
   } else {
     css.push('p-4')
   }
-  css = css.join(' ')
+
+  const cssF = css.join(' ')
+
   return (
-    <div className={`w-full flex items-center justify-start p-4 ${css}`}>
+    <div className={`w-full flex items-center justify-start p-4 ${cssF}`}>
       <div className="flex-shrink">{icon}</div>
       <div className="flex-grow">{children}</div>
       <div className="flex-shrink">

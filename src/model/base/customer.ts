@@ -10,7 +10,7 @@ class CustomerOptions {
   inputValue?: string
   code: string
   name: string
-  vat: string
+  vatNumber: string
   address: string
 }
 

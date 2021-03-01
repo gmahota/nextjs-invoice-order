@@ -7,7 +7,12 @@ import { GetStaticProps, GetStaticPaths } from 'next'
 import Order from '../../../model/sales/order'
 import OrderItem from '../../../model/sales/orderItem'
 
-import { CustomerOptions } from '../../../model/base/customer'
+import { Customer, CustomerOptions } from '../../../model/base/customer'
+import { Product, ProductOptions } from '../../../model/base/product'
+import { Project, ProjectOptions } from '../../../model/base/project'
+import { get_Customers } from '../../../service/base/customerService'
+import { get_Products } from '../../../service/base/productService'
+import { get_Projects } from '../../../service/base/projectService'
 
 import moment from 'moment'
 
@@ -57,6 +62,7 @@ import { OrderApproval } from './../../../components/Order/OrderApproval'
 import { InvoiceList } from './../../../components/Invoice/InvoiceList'
 import orderService from '../../../service/sales/orderService'
 import { NumberFormatCustom } from './../../../components/NumberFormat/NumberFormatCustom'
+import Select from 'react-select'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -120,19 +126,13 @@ const useStyles = makeStyles((theme: Theme) =>
     }
   })
 )
-interface ProductOptions {
-  inputValue?: string
-  code: string
-  description: string
-  price: number
-}
-interface ProjectOptions {
-  inputValue?: string
-  code: string
-  description: string
-}
 
-export default function OrderDetails({ order }) {
+export default function OrderDetails({
+  order,
+  allCustomers,
+  allProducts,
+  allProjects
+}) {
   const router = useRouter()
 
   if (router.isFallback) {
@@ -180,31 +180,6 @@ export default function OrderDetails({ order }) {
     order.items?.reduce((sum, current) => sum + current.total, 0)
   )
   const [value, setValue] = React.useState('1')
-  // Top 100 films as rated by IMDb users. http://www.imdb.com/chart/top
-  const productList: ProductOptions[] = [
-    { code: 'A001', description: 'Teste', price: 1000 },
-    { code: 'A002', description: 'Teste 2', price: 2000 }
-  ]
-
-  const projectList: ProjectOptions[] = [
-    { code: 'P001', description: 'Teste' },
-    { code: 'P002', description: 'Teste 2' }
-  ]
-
-  const customerList: CustomerOptions[] = [
-    {
-      code: 'C001',
-      name: 'Vercel,LDA',
-      vat: '411411',
-      address: 'Beira'
-    },
-    {
-      code: 'C002',
-      name: 'Node.js, SA',
-      vat: '411412',
-      address: 'Maputo'
-    }
-  ]
 
   const handleSave = () => {
     // setOpen(true)
@@ -310,40 +285,20 @@ export default function OrderDetails({ order }) {
                       <Grid container>
                         <Grid item xs={8}>
                           <div>
-                            <Autocomplete
+                            <Select
                               id="customer_code"
-                              options={customerList}
-                              getOptionLabel={option => {
-                                // Value selected with enter, right from the input
-                                if (typeof option === 'string') {
-                                  return option
-                                }
-                                // Add "xxx" option created dynamically
-                                if (option.inputValue) {
-                                  return option.inputValue
-                                }
-                                // Regular option
-                                return option.name
-                              }}
+                              options={allCustomers}
                               disabled={isSubmitting}
                               value={customer}
                               style={{ width: 300 }}
-                              renderOption={option => option.code}
-                              renderInput={params => (
-                                <TextField
-                                  {...params}
-                                  label="Customer"
-                                  type="text"
-                                />
-                              )}
                               onChange={(
                                 event: any,
                                 newValue: CustomerOptions | null
                               ) => {
-                                if (newValue!) {
+                                if (!newValue) {
                                   setCustomer(newValue.code)
                                   setName(newValue.name)
-                                  setVat(newValue.vat)
+                                  setVat(newValue.vatNumber)
                                   setAddress(newValue.address)
                                   setDocument('')
                                 } else {
@@ -546,28 +501,12 @@ export default function OrderDetails({ order }) {
         <DialogContent>
           <DialogContentText>Add new Item.</DialogContentText>
 
-          <Autocomplete
+          <Select
             id="product_code"
-            options={productList}
-            getOptionLabel={option => {
-              // Value selected with enter, right from the input
-              if (typeof option === 'string') {
-                return option
-              }
-              // Add "xxx" option created dynamically
-              if (option.inputValue) {
-                return option.inputValue
-              }
-              // Regular option
-              return option.code
-            }}
+            options={allProducts}
             value={itemCode}
-            renderOption={option => option.code}
-            renderInput={params => (
-              <TextField {...params} label="Code" type="text" fullWidth />
-            )}
             onChange={(event: any, newValue: ProductOptions | null) => {
-              if (newValue!) {
+              if (!newValue) {
                 setItemCode(newValue.code)
                 setItemDescription(newValue.description)
                 setItemPrice(newValue.price)
@@ -592,28 +531,12 @@ export default function OrderDetails({ order }) {
             fullWidth
           />
 
-          <Autocomplete
+          <Select
             id="itemProject"
-            options={projectList}
-            getOptionLabel={option => {
-              // Value selected with enter, right from the input
-              if (typeof option === 'string') {
-                return option
-              }
-              // Add "xxx" option created dynamically
-              if (option.inputValue) {
-                return option.inputValue
-              }
-              // Regular option
-              return option.code
-            }}
+            options={allProjects}
             value={itemProject}
-            renderOption={option => option.code}
-            renderInput={params => (
-              <TextField {...params} label="Project" type="text" fullWidth />
-            )}
             onChange={(event: any, newValue: ProjectOptions | null) => {
-              if (newValue!) {
+              if (!newValue) {
                 setItemProject(newValue.code)
               } else {
                 setItemProject('')
@@ -721,10 +644,40 @@ export const getStaticProps: GetStaticProps = async context => {
     const { id } = context.params
 
     const order: Order = await orderService.get_Order(id[0])
-    console.log(order)
+
+    const customers: Customer[] = await get_Customers()
+
+    const allCustomers = customers.map(customer => {
+      const c: CustomerOptions = {
+        ...customer
+      }
+      return c
+    })
+
+    const products = await get_Products()
+
+    const allProducts = products.map(product => {
+      const p: ProductOptions = {
+        ...product
+      }
+      return p
+    })
+
+    const projects = await get_Projects()
+
+    const allProjects = projects.map(project => {
+      const p: ProjectOptions = {
+        ...project
+      }
+      return p
+    })
+
     return {
       props: {
-        order: order
+        order: order,
+        allCustomers,
+        allProducts,
+        allProjects
       },
       revalidate: 10
     }

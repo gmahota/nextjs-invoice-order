@@ -4,7 +4,9 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
 
 import Order from '../../model/sales/order'
 import OrderItem from '../../model/sales/orderItem'
-import { CustomerOptions } from '../../model/base/customer'
+import { Customer, CustomerOptions } from '../../model/base/customer'
+import { Product, ProductOptions } from '../../model/base/product'
+import { Project, ProjectOptions } from '../../model/base/project'
 import { get_Customers } from '../../service/base/customerService'
 import { get_Products } from '../../service/base/productService'
 import { get_Projects } from '../../service/base/projectService'
@@ -19,8 +21,6 @@ import MaskedInput from 'react-text-mask'
 import NumberFormat from 'react-number-format'
 
 import Avatar from '@material-ui/core/Avatar'
-import Autocomplete from '@material-ui/lab/Autocomplete'
-
 import Box from '@material-ui/core/Box'
 
 import Card from '@material-ui/core/Card'
@@ -48,6 +48,7 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import { red } from '@material-ui/core/colors'
 import IconButton from '@material-ui/core/IconButton'
 import AddCircle from '@material-ui/icons/AddCircle'
+import Select from 'react-select'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -108,18 +109,6 @@ const useStyles = makeStyles((theme: Theme) =>
     }
   })
 )
-interface ProductOptions {
-  inputValue?: string
-  code: string
-  description: string
-  price: number
-}
-
-interface ProjectOptions {
-  inputValue?: string
-  code: string
-  description: string
-}
 interface NumberFormatCustomProps {
   inputRef: (instance: NumberFormat | null) => void
   onChange: (event: { target: { name: string; value: string } }) => void
@@ -296,26 +285,19 @@ export default function CreateOrder({
             <div className="grid-rows-3 grid-flow-col">
               <div>
                 <div>
-                  <Autocomplete
+                  <Select
                     id="customer_code"
                     options={allCustomers}
                     getOptionLabel={option => option.name}
                     style={{ width: 600 }}
-                    renderInput={params => (
-                      <TextField
-                        {...params}
-                        label="Customer"
-                        variant="outlined"
-                      />
-                    )}
                     onChange={(
                       event: any,
                       newValue: CustomerOptions | null
                     ) => {
-                      if (newValue!) {
+                      if (!newValue) {
                         setCustomer(newValue.code)
                         setName(newValue.name || '')
-                        setVat(newValue.vat || '')
+                        setVat(newValue.vatNumber || '')
                         setAddress(newValue.address || '')
                         setDocument('')
                       } else {
@@ -481,30 +463,14 @@ export default function CreateOrder({
           <DialogContent>
             <DialogContentText>Add new Item.</DialogContentText>
 
-            <Autocomplete
+            <Select
               id="product_code"
               options={allProducts}
-              getOptionLabel={option=> {
-                // Value selected with enter, right from the input
-                if (typeof option === 'string') {
-                  return option
-                }
-                
-                // Add "xxx" option created dynamically
-                if (option.inputValue) {
-                  return option.inputValue
-                }
-                // Regular option
-                return option.code
-              }}
               value={itemCode}
               renderOption={option => option.code}
-              renderInput={params => (
-                <TextField {...params} label="Code" type="text" fullWidth />
-              )}
               onChange={(event: any, newValue: ProductOptions | null) => {
-                if (newValue!) {
-                  setItemCode(newValue.id)
+                if (!newValue) {
+                  setItemCode(newValue.code)
                   setItemDescription(newValue.description)
                   setItemPrice(newValue.price)
                 } else {
@@ -528,29 +494,13 @@ export default function CreateOrder({
               fullWidth
             />
 
-            <Autocomplete
+            <Select
               id="itemProject"
               options={allProjects}
-              getOptionLabel={option => {
-                // Value selected with enter, right from the input
-                if (typeof option === 'string') {
-                  return option
-                }
-                // Add "xxx" option created dynamically
-                if (option.inputValue) {
-                  return option.inputValue
-                }
-                // Regular option
-                return option.code
-              }}
               value={itemProject}
-              renderOption={option => option.code}
-              renderInput={params => (
-                <TextField {...params} label="Project" type="text" fullWidth />
-              )}
               onChange={(event: any, newValue: ProjectOptions | null) => {
-                if (newValue!) {
-                  setItemProject(newValue.id)
+                if (!newValue) {
+                  setItemProject(newValue.code)
                 } else {
                   setItemProject('')
                 }
@@ -626,7 +576,7 @@ export default function CreateOrder({
 }
 
 export const getStaticProps = async () => {
-  const customers = await get_Customers()
+  const customers: Customer[] = await get_Customers()
 
   const allCustomers = customers.map(customer => {
     const c: CustomerOptions = {
