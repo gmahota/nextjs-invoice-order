@@ -480,15 +480,16 @@ export default function CreateOrder({
           <DialogTitle id="form-dialog-title">Document Item</DialogTitle>
           <DialogContent>
             <DialogContentText>Add new Item.</DialogContentText>
-                        
+
             <Autocomplete
               id="product_code"
               options={allProducts}
-              getOptionLabel={option => {
+              getOptionLabel={option=> {
                 // Value selected with enter, right from the input
                 if (typeof option === 'string') {
                   return option
                 }
+                
                 // Add "xxx" option created dynamically
                 if (option.inputValue) {
                   return option.inputValue
