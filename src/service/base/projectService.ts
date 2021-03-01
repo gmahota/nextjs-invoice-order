@@ -9,12 +9,12 @@ const get_ProjectById = async (id: number): Promise<Project> => {
       `${publicRuntimeConfig.SERVER_URI}base/Projects/${id}`
     )
 
-    const { code, description, price } = await response.json()
+    const { code, description, status } = await response.json()
     const data: Project = {
       id,
       code,
       description,
-      price
+      status
     }
     return data
   } catch (e) {
@@ -22,7 +22,7 @@ const get_ProjectById = async (id: number): Promise<Project> => {
   }
 }
 
-const get_Projects: Project[] = async (): Project[] => {
+const get_Projects = async (): Promise<Project[]> => {
   try {
     const response = await fetch(
       `${publicRuntimeConfig.SERVER_URI}base/Projects/`

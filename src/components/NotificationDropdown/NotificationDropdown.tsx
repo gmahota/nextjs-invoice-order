@@ -1,16 +1,17 @@
-import React from 'react'
+import React, { createRef } from 'react'
 import Popper from 'popper.js'
 
 const NotificationDropdown = () => {
   // dropdown props
   const [dropdownPopoverShow, setDropdownPopoverShow] = React.useState(false)
-  const btnDropdownRef = React.createRef()
-  const popoverDropdownRef = React.createRef()
+  const btnDropdownRef = createRef()
+  const popoverDropdownRef = createRef()
+
   const openDropdownPopover = () => {
-    console.log('hey')
-    new Popper(btnDropdownRef.current, popoverDropdownRef.current, {
-      placement: 'bottom-end'
-    })
+    // console.log('hey')
+    // new Popper(btnDropdownRef.current, popoverDropdownRef.current, {
+    //   placement: 'bottom-end'
+    // })
     setDropdownPopoverShow(true)
   }
   const closeDropdownPopover = () => {
@@ -21,7 +22,7 @@ const NotificationDropdown = () => {
       <a
         className="text-gray-600 block py-1 px-3"
         href="#pablo"
-        ref={btnDropdownRef}
+        // ref={btnDropdownRef}
         onClick={e => {
           e.preventDefault()
           dropdownPopoverShow ? closeDropdownPopover() : openDropdownPopover()
@@ -30,7 +31,7 @@ const NotificationDropdown = () => {
         <i className="fas fa-bell"></i>
       </a>
       <div
-        ref={popoverDropdownRef}
+        // ref={popoverDropdownRef}
         className={
           (dropdownPopoverShow ? 'block ' : 'hidden ') +
           'bg-white text-base z-50 float-left py-2 list-none text-left rounded shadow-lg mt-1'

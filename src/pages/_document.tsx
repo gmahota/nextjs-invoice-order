@@ -8,14 +8,14 @@ class Document extends NextDocument {
 
   render() {
     return (
-      <Html lang="en" class="text-gray-900 leading-tight">
+      <Html lang="en" className="text-gray-900 leading-tight">
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <style>
-            {`#__next {
+            {/* {`#__next {
                                 height: ${this.props.shouldShow ? '100%' : '0'}
                             }
-                        `}
+                        `} */}
           </style>
         </Head>
         <body className="text-gray-800 antialiased">

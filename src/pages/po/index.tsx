@@ -5,6 +5,13 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
 
 import useSWR from 'swr'
 
+import { Customer, CustomerOptions } from '../../model/base/customer'
+import { Product, ProductOptions } from '../../model/base/product'
+import { Project, ProjectOptions } from '../../model/base/project'
+import { get_Customers } from '../../service/base/customerService'
+import { get_Products } from '../../service/base/productService'
+import { get_Projects } from '../../service/base/projectService'
+
 // Material Ui
 import Avatar from '@material-ui/core/Avatar'
 import Card from '@material-ui/core/Card'
@@ -39,9 +46,12 @@ import {
 import DetailsOutlined from '@material-ui/icons/DetailsOutlined'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import Autocomplete from '@material-ui/lab/Autocomplete'
-import { CustomerOptions } from '../../model/base/customer'
+
 import DialogActions from '@material-ui/core/DialogActions'
 import CustomerDocument from '../../model/sales/customerDocument'
+import Select from 'react-select'
+
+const fetcher = url => fetch(url).then(r => r.json())
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -49,9 +59,6 @@ const useStyles = makeStyles((theme: Theme) =>
       '& .MuiTextField-root': {
         margin: theme.spacing(1),
         width: '25ch'
-      },
-      '& > *': {
-        borderBottom: 'unset'
       }
     },
     bullet: {
@@ -106,32 +113,16 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-const fetcher = url => fetch(url).then(r => r.json())
-
-const customerList: CustomerOptions[] = [
-  {
-    code: 'C001',
-    name: 'Vercel,LDA',
-    vat: '411411',
-    address: 'Beira'
-  },
-  {
-    code: 'C002',
-    name: 'Node.js, SA',
-    vat: '411412',
-    address: 'Maputo'
-  }
-]
-
 type DocumentItemProps = {
   children?: React.ReactNode
+  allCustomers: CustomerOptions[]
   open: boolean
   handleClose?: any
   handleSave?: any
 }
 
 function NewDocument(props: DocumentItemProps) {
-  const { open, handleClose, handleSave } = props
+  const { open, handleClose, handleSave, allCustomers } = props
 
   const [code, setCode] = React.useState('')
   const [customer, setCustomer] = React.useState('')
@@ -186,28 +177,12 @@ function NewDocument(props: DocumentItemProps) {
           fullWidth
         />
 
-        <Autocomplete
+        <Select
           id="customer"
-          options={customerList}
-          getOptionLabel={option => {
-            // Value selected with enter, right from the input
-            if (typeof option === 'string') {
-              return option
-            }
-            // Add "xxx" option created dynamically
-            if (option.inputValue) {
-              return option.inputValue
-            }
-            // Regular option
-            return option.code
-          }}
+          options={allCustomers}
           value={customer}
-          renderOption={option => option.code}
-          renderInput={params => (
-            <TextField {...params} label="Code" type="text" fullWidth />
-          )}
           onChange={(event: any, newValue: CustomerOptions | null) => {
-            if (newValue!) {
+            if (!newValue) {
               setCustomer(newValue.code)
             } else {
               setCustomer('')
@@ -238,7 +213,11 @@ function NewDocument(props: DocumentItemProps) {
   )
 }
 
-export default function InvoiceOrderList() {
+export default function InvoiceOrderList(
+  allCustomers,
+  allProducts,
+  allProjects
+) {
   const router = useRouter()
 
   if (router.isFallback) {
@@ -320,7 +299,45 @@ export default function InvoiceOrderList() {
         open={openNewDocument}
         handleClose={handleClose}
         handleSave={handleSave}
+        allCustomers={allCustomers}
       />
     </>
   )
+}
+
+export const getStaticProps = async () => {
+  const customers: Customer[] = await get_Customers()
+
+  const allCustomers = customers.map(customer => {
+    const c: CustomerOptions = {
+      ...customer
+    }
+    return c
+  })
+
+  const products = await get_Products()
+
+  const allProducts = products.map(product => {
+    const p: ProductOptions = {
+      ...product
+    }
+    return p
+  })
+
+  const projects = await get_Projects()
+
+  const allProjects = projects.map(project => {
+    const p: ProjectOptions = {
+      ...project
+    }
+    return p
+  })
+
+  return {
+    props: {
+      allCustomers,
+      allProducts,
+      allProjects
+    }
+  }
 }

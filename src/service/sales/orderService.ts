@@ -43,15 +43,15 @@ const get_Orders = async (): Promise<Order[]> => {
 
 const get_Order = async (id: string): Promise<Order> => {
   try {
-    let order = {}
-    order = await fetch(publicRuntimeConfig.SERVER_URI + `sales/orders/${id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
+    const order: Order = await fetch(
+      publicRuntimeConfig.SERVER_URI + `sales/orders/${id}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       }
-    })
-      .then(response => response.json())
-      .then((data: Order) => (order = data))
+    ).then(response => response.json())
 
     return order
   } catch (e: any) {
