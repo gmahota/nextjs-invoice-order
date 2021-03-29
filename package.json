@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "export": "next build && next export"
+    "export": "next build && next export",
+    "deploy":"vercel"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.2",
